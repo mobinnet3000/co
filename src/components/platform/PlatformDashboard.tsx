@@ -211,12 +211,12 @@ export const PlatformDashboard: React.FC = () => {
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="feedColor" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#35B6C8" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#35B6C8" stopOpacity={0.0} />
+                        <stop offset="5%" stopColor="#EFA73F" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#EFA73F" stopOpacity={0.0} />
                       </linearGradient>
                       <linearGradient id="powerColor" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#B77A45" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#B77A45" stopOpacity={0.0} />
+                        <stop offset="5%" stopColor="#C92127" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#C92127" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1E3752" />
@@ -224,8 +224,8 @@ export const PlatformDashboard: React.FC = () => {
                     <YAxis stroke="#64748B" fontSize={11} domain={['dataMin - 20', 'dataMax + 20']} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#101D2D',
-                        borderColor: '#245B8F',
+                        backgroundColor: '#0F1821',
+                        borderColor: '#EFA73F',
                         borderRadius: '10px',
                         color: '#FFF',
                         fontSize: '12px',
@@ -238,7 +238,7 @@ export const PlatformDashboard: React.FC = () => {
                       type="monotone"
                       dataKey="feedRate"
                       name="نرخ خوراک (تن بر ساعت)"
-                      stroke="#35B6C8"
+                      stroke="#EFA73F"
                       strokeWidth={2.5}
                       fillOpacity={1}
                       fill="url(#feedColor)"
@@ -247,7 +247,7 @@ export const PlatformDashboard: React.FC = () => {
                       type="monotone"
                       dataKey="power"
                       name="توان مصرفی آسیای نیمه‌خودشکن (کیلووات)"
-                      stroke="#B77A45"
+                      stroke="#C92127"
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#powerColor)"
@@ -280,8 +280,8 @@ export const PlatformDashboard: React.FC = () => {
                     <YAxis stroke="#64748B" fontSize={11} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#101D2D',
-                        borderColor: '#245B8F',
+                        backgroundColor: '#0F1821',
+                        borderColor: '#EFA73F',
                         borderRadius: '10px',
                         color: '#FFF',
                         fontSize: '12px',
@@ -290,8 +290,8 @@ export const PlatformDashboard: React.FC = () => {
                       }}
                     />
                     <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                    <Bar dataKey="tonnage" name="تناژ واقعی محقق‌شده (تن)" fill="#35B6C8" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="target" name="هدف اسمی شیفت (تن)" fill="#245B8F" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="tonnage" name="تناژ واقعی محقق‌شده (تن)" fill="#EFA73F" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="target" name="هدف اسمی شیفت (تن)" fill="#324C64" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

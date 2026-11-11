@@ -66,7 +66,11 @@ export const AboutPage: React.FC = () => {
                 </h3>
                 <dl className="space-y-3 text-xs sm:text-sm">
                   <div className="flex justify-between py-1.5 border-b border-slate-100">
-                    <dt className="text-slate-500">نام رسمی:</dt>
+                    <dt className="text-slate-500">نام تجاری:</dt>
+                    <dd className="font-bold text-navy-900 text-left">معدنکو (MADAN CO)</dd>
+                  </div>
+                  <div className="flex justify-between py-1.5 border-b border-slate-100">
+                    <dt className="text-slate-500">نام ثبتی:</dt>
                     <dd className="font-semibold text-navy-900 text-left">{companyData.officialNameFa}</dd>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-slate-100">
@@ -79,7 +83,7 @@ export const AboutPage: React.FC = () => {
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-slate-100">
                     <dt className="text-slate-500">شعار سازمانی:</dt>
-                    <dd className="font-semibold text-brand-blue">«{companyData.taglineFa}»</dd>
+                    <dd className="font-semibold text-brand-amberDark">«{companyData.taglineFa}»</dd>
                   </div>
                 </dl>
 
