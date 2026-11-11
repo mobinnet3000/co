@@ -1,5 +1,0 @@
-# robots.txt for mohasebat-novin
-User-agent: *
-Allow: /
-
-Sitemap: https://novin-amaliat.ir/sitemap.xml
