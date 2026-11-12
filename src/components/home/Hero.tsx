@@ -57,7 +57,7 @@ export const Hero: React.FC = () => {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative min-h-[88vh] flex items-center justify-center pt-28 pb-14 sm:py-24 bg-brand-sand text-navy-900 overflow-hidden select-none border-b border-brand-border"
+      className="relative flex justify-center pt-36 sm:pt-40 md:pt-44 lg:pt-48 pb-10 sm:pb-12 md:pb-14 bg-brand-sand text-navy-900 overflow-hidden select-none border-b border-brand-border"
     >
       {/* Background Architectural Guidelines - Ultra Minimal & Subtle */}
       <div className="absolute inset-0 pointer-events-none opacity-30">
