@@ -11,6 +11,14 @@ import { GalleryBlock } from './GalleryBlock';
 import { TimelineBlock } from './TimelineBlock';
 import { ServicesGridBlock } from './ServicesGridBlock';
 import { DownloadsBlock } from './DownloadsBlock';
+import { ImageBlock } from './ImageBlock';
+import { ImageTextBlock } from './ImageTextBlock';
+import { VideoBlock } from './VideoBlock';
+import { LogoCloudBlock } from './LogoCloudBlock';
+import { TestimonialsBlock } from './TestimonialsBlock';
+import { CardsBlock } from './CardsBlock';
+import { ContactInfoBlock } from './ContactInfoBlock';
+import { TeamBlock } from './TeamBlock';
 
 export interface PageSectionData {
   id: number;
@@ -32,6 +40,10 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ section }) => {
       return <HeroBlock config={section.config} />;
     case 'text':
       return <TextBlock config={section.config} />;
+    case 'image':
+      return <ImageBlock config={section.config} />;
+    case 'image_text':
+      return <ImageTextBlock config={section.config} />;
     case 'features':
       return <FeaturesBlock config={section.config} />;
     case 'stats':
@@ -46,12 +58,24 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ section }) => {
       return <ShowcaseBlock config={section.config} />;
     case 'gallery':
       return <GalleryBlock config={section.config} />;
+    case 'video':
+      return <VideoBlock config={section.config} />;
+    case 'logo_cloud':
+      return <LogoCloudBlock config={section.config} />;
+    case 'testimonials':
+      return <TestimonialsBlock config={section.config} />;
+    case 'cards':
+      return <CardsBlock config={section.config} />;
+    case 'contact_info':
+      return <ContactInfoBlock config={section.config} />;
+    case 'downloads':
+      return <DownloadsBlock config={section.config} />;
+    case 'team':
+      return <TeamBlock config={section.config} />;
     case 'timeline':
       return <TimelineBlock config={section.config} />;
     case 'services_grid':
       return <ServicesGridBlock config={section.config} />;
-    case 'downloads':
-      return <DownloadsBlock config={section.config} />;
     case 'html':
       return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

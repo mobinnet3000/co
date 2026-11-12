@@ -400,7 +400,7 @@ test('16. Editorial Publishing Workflow & Draft Isolation', async () => {
 });
 
 test('17. Extended Page Builder Block Types Support', async () => {
-  const newBlocks = ['gallery', 'timeline', 'services_grid', 'downloads'];
+  const newBlocks = ['gallery', 'timeline', 'services_grid', 'downloads', 'image', 'image_text', 'video', 'logo_cloud', 'testimonials', 'cards', 'contact_info', 'team'];
   for (const type of newBlocks) {
     const res = await fetch(`${baseUrl}/api/sections/page/1`, {
       method: 'POST',
@@ -423,4 +423,79 @@ test('17. Extended Page Builder Block Types Support', async () => {
       headers: { Authorization: `Bearer ${authToken}` },
     });
   }
+});
+
+test('18. Public Article by Slug & Draft Protection', async () => {
+  // Test published article lookup
+  const pubSlug = 'role-of-data-analytics-in-mineral-processing-performance';
+  const res = await fetch(`${baseUrl}/api/articles/public/${pubSlug}`);
+  assert.strictEqual(res.status, 200);
+  const data = await res.json();
+  assert.strictEqual(data.success, true);
+  assert.strictEqual(data.data.slug, pubSlug);
+  assert.strictEqual(data.data.status, 'published');
+
+  // Test draft article slug lookup on public endpoint - MUST BE 404
+  const draftSlug = 'draft-flotation-reagents-selectivity-study';
+  const draftRes = await fetch(`${baseUrl}/api/articles/public/${draftSlug}`);
+  assert.strictEqual(draftRes.status, 404, 'Draft articles must not be accessible via public endpoint');
+});
+
+test('19. Categories CRUD & Slug Updating', async () => {
+  const uniqueSuffix = Date.now();
+  // Create category
+  const createRes = await fetch(`${baseUrl}/api/categories`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({
+      name: `متالورژی پیشرفته آزمون ${uniqueSuffix}`,
+      slug: `advanced-test-metallurgy-${uniqueSuffix}`,
+      description: 'دسته‌بندی تستی آزمون خودکار',
+    }),
+  });
+  assert.strictEqual(createRes.status, 201);
+  const createData = await createRes.json();
+  const catId = createData.id;
+  assert.ok(catId);
+
+  // Update category
+  const updateRes = await fetch(`${baseUrl}/api/categories/${catId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({
+      name: `متالورژی پیشرفته به‌روزرسانی ${uniqueSuffix}`,
+      description: 'توضیحات جدید به‌روزشده',
+    }),
+  });
+  assert.strictEqual(updateRes.status, 200);
+
+  // Clean up delete
+  const delRes = await fetch(`${baseUrl}/api/categories/${catId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  assert.strictEqual(delRes.status, 200);
+});
+
+test('20. Root Health Check Endpoint (/health)', async () => {
+  const res = await fetch(`${baseUrl}/health`);
+  assert.strictEqual(res.status, 200);
+  const data = await res.json();
+  assert.strictEqual(data.status, 'healthy');
+  assert.strictEqual(data.service, 'MadanCo Corporate Platform');
+});
+
+test('21. Unhandled API Route Returns Clean JSON 404 (Not HTML)', async () => {
+  const res = await fetch(`${baseUrl}/api/non-existent-endpoint-${Date.now()}`);
+  assert.strictEqual(res.status, 404);
+  const contentType = res.headers.get('content-type') || '';
+  assert.ok(contentType.includes('application/json'), `Expected JSON response, got ${contentType}`);
+  const data = await res.json();
+  assert.strictEqual(data.success, false);
 });

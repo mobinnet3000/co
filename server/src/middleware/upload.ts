@@ -28,13 +28,22 @@ const allowedMimes = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
 
+const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif', '.pdf', '.doc', '.docx'];
+const dangerousExtensions = ['.php', '.phtml', '.php5', '.exe', '.sh', '.bash', '.js', '.cjs', '.mjs', '.bat', '.cmd', '.py', '.pl', '.cgi', '.jar'];
+
 export const uploadMiddleware = multer({
   storage,
   limits: {
     fileSize: 15 * 1024 * 1024, // 15 MB limit
   },
   fileFilter: (req, file, cb) => {
-    if (allowedMimes.includes(file.mimetype)) {
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    if (dangerousExtensions.includes(ext)) {
+      return cb(new Error('بارگذاری فایل‌های اسکریپت یا اجرایی اکیداً غیرمجاز است.'));
+    }
+
+    if (allowedMimes.includes(file.mimetype) && allowedExtensions.includes(ext)) {
       cb(null, true);
     } else {
       cb(new Error('فرمت فایل مجاز نیست. تنها فرمت‌های تصویری و اسناد PDF/DOC مجاز هستند.'));

@@ -47,7 +47,7 @@ export const categoriesController = {
       return res.status(404).json({ success: false, message: 'دسته‌بندی یافت نشد.' });
     }
 
-    const cleanSlug = slug ? slug.trim().toLowerCase().replace(/\s+/g, '-') : undefined;
+    const cleanSlug = slug ? slug.trim().toLowerCase().replace(/\s+/g, '-') : null;
 
     db.prepare(`
       UPDATE categories SET
@@ -55,7 +55,7 @@ export const categoriesController = {
         slug = COALESCE(?, slug),
         description = COALESCE(?, description)
       WHERE id = ?
-    `).run(name, cleanSlug, description, id);
+    `).run(name ?? null, cleanSlug ?? null, description ?? null, id);
 
     res.json({ success: true, message: 'دسته‌بندی با موفقیت به‌روزرسانی شد.' });
   },

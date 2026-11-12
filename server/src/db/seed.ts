@@ -2,19 +2,21 @@ import bcrypt from 'bcryptjs';
 import { db } from './database';
 import { technicalArticles } from './seedArticles';
 import { draftArticles } from './draftArticles';
+import { config } from '../config';
 
 export function seedDatabase() {
   const now = new Date().toISOString();
 
   // 1. Seed Super Admin User if not exists
-  const userCheck = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
+  const adminUsername = config.initialAdminUsername || 'admin';
+  const userCheck = db.prepare('SELECT id FROM users WHERE username = ?').get(adminUsername);
   if (!userCheck) {
-    const passwordHash = bcrypt.hashSync('MadanCo@2026!Admin', 10);
+    const passwordHash = bcrypt.hashSync(config.initialAdminPassword, 10);
     db.prepare(`
       INSERT INTO users (username, email, password_hash, full_name, role, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, 1, ?, ?)
-    `).run('admin', 'info@madan.co.ir', passwordHash, 'مدیر ارشد سامانه معدنکو', 'super_admin', now, now);
-    console.log('✓ Super Admin user seeded: admin / MadanCo@2026!Admin');
+    `).run(adminUsername, config.initialAdminEmail, passwordHash, 'مدیر ارشد سامانه معدنکو', 'super_admin', now, now);
+    console.log(`✓ Super Admin user initialized for username: "${adminUsername}"`);
   }
 
   // 2. Seed Default Global Settings

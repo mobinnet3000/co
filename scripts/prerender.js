@@ -8,8 +8,9 @@ const __dirname = path.dirname(__filename);
 const distDir = path.resolve(__dirname, '../dist');
 const dbPath = path.resolve(__dirname, '../server/data/madanco.sqlite');
 
-// Query dynamic articles from SQLite to include in static HTML generation
+// Query dynamic articles and custom CMS pages from SQLite to include in static HTML generation
 const dynamicArticleRoutes = [];
+const dynamicPageRoutes = [];
 if (fs.existsSync(dbPath)) {
   try {
     const db = new DatabaseSync(dbPath);
@@ -36,6 +37,20 @@ if (fs.existsSync(dbPath)) {
         },
         bodyContent: `<div class="ssr-prerender-seo" style="display:none"><h1>${art.title}</h1><p>${art.summary}</p><div>${art.content_html}</div></div>`,
       });
+    }
+
+    const publishedPages = db.prepare("SELECT title, slug, excerpt, content, seo_title, seo_description, focus_keyword, canonical_url FROM pages WHERE status = 'published'").all();
+    for (const page of publishedPages) {
+      if (page.slug && page.slug !== 'home') {
+        dynamicPageRoutes.push({
+          path: `/p/${page.slug}`,
+          title: `${page.seo_title || page.title} | شرکت محاسبات عملیات داده ارزیابی نوین`,
+          description: page.seo_description || page.excerpt || page.title,
+          keywords: page.focus_keyword || 'معدنکو, محاسبات عملیات داده',
+          canonical: page.canonical_url || `https://madan.co.ir/p/${page.slug}`,
+          bodyContent: `<div class="ssr-prerender-seo" style="display:none"><h1>${page.title}</h1><p>${page.excerpt || ''}</p><div>${page.content || ''}</div></div>`,
+        });
+      }
     }
   } catch (err) {
     console.warn('Notice: SQLite query during prerender:', err.message);
@@ -200,12 +215,18 @@ const routes = [
   },
 ];
 
-// Merge dynamic articles into prerender routes (ensuring full SEO coverage)
+// Merge dynamic articles and custom pages into prerender routes (ensuring full SEO coverage)
 const existingPaths = new Set(routes.map((r) => r.path));
 for (const artRoute of dynamicArticleRoutes) {
   if (!existingPaths.has(artRoute.path)) {
     routes.push(artRoute);
     existingPaths.add(artRoute.path);
+  }
+}
+for (const pageRoute of dynamicPageRoutes) {
+  if (!existingPaths.has(pageRoute.path)) {
+    routes.push(pageRoute);
+    existingPaths.add(pageRoute.path);
   }
 }
 

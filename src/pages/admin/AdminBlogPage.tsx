@@ -1,5 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Plus, Edit2, Trash2, ExternalLink, Star, Tag, Folder, Check, AlertCircle, X, Search } from 'lucide-react';
+import {
+  BookOpen,
+  Plus,
+  Edit2,
+  Trash2,
+  ExternalLink,
+  Star,
+  Tag,
+  Folder,
+  Check,
+  AlertCircle,
+  X,
+  Search,
+  Eye,
+  Heading,
+  Bold,
+  Italic,
+  List,
+  Quote,
+  Code,
+  Table as TableIcon,
+  Link as LinkIcon,
+  Image as ImageIcon,
+  Clock,
+  Calendar,
+} from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { api } from '../../services/api';
 
@@ -9,7 +34,9 @@ export const AdminBlogPage: React.FC = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [message, setMessage] = useState<{ text: string; isError?: boolean } | null>(null);
+  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
 
   // Editor State
   const [editArticleId, setEditArticleId] = useState<number | null>(null);
@@ -19,6 +46,7 @@ export const AdminBlogPage: React.FC = () => {
     summary: '',
     content_html: '',
     category_id: '',
+    author_name: 'واحد تحقیق و توسعه معدنکو',
     reading_time: '۷ دقیقه',
     status: 'published',
     is_featured: false,
@@ -28,7 +56,8 @@ export const AdminBlogPage: React.FC = () => {
     focus_keyword: '',
   });
 
-  // Category & Tag form states
+  // Category State
+  const [editingCatId, setEditingCatId] = useState<number | null>(null);
   const [newCatName, setNewCatName] = useState('');
   const [newCatSlug, setNewCatSlug] = useState('');
   const [newCatDesc, setNewCatDesc] = useState('');
@@ -58,6 +87,7 @@ export const AdminBlogPage: React.FC = () => {
       summary: '',
       content_html: '',
       category_id: categories[0]?.id ? String(categories[0].id) : '',
+      author_name: 'واحد تحقیق و توسعه معدنکو',
       reading_time: '۷ دقیقه',
       status: 'published',
       is_featured: false,
@@ -81,10 +111,11 @@ export const AdminBlogPage: React.FC = () => {
           summary: art.summary || '',
           content_html: art.content_html || '',
           category_id: art.category_id ? String(art.category_id) : '',
+          author_name: art.author_name || 'واحد تحقیق و توسعه معدنکو',
           reading_time: art.reading_time || '۷ دقیقه',
           status: art.status || 'published',
           is_featured: !!art.is_featured,
-          tagsInput: Array.isArray(art.tags) ? art.tags.map((t: any) => t.name).join(', ') : '',
+          tagsInput: Array.isArray(art.tags) ? art.tags.map((t: any) => (typeof t === 'string' ? t : t.name)).join(', ') : '',
           seo_title: art.seo_title || '',
           seo_description: art.seo_description || '',
           focus_keyword: art.focus_keyword || '',
@@ -94,6 +125,13 @@ export const AdminBlogPage: React.FC = () => {
     } catch (err: any) {
       setMessage({ text: err.message, isError: true });
     }
+  };
+
+  const insertSnippet = (snippet: string) => {
+    setArticleForm((prev) => ({
+      ...prev,
+      content_html: prev.content_html + (prev.content_html.endsWith('\n') ? '' : '\n') + snippet + '\n',
+    }));
   };
 
   const handleSaveArticle = async (e: React.FormEvent) => {
@@ -114,7 +152,7 @@ export const AdminBlogPage: React.FC = () => {
         setMessage({ text: 'مقاله با موفقیت به‌روزرسانی شد.' });
       } else {
         await api.articles.create(payload);
-        setMessage({ text: 'مقاله جدید با موفقیت منتشر گردید.' });
+        setMessage({ text: 'مقاله جدید با موفقیت ذخیره گردید.' });
       }
       loadData();
       setActiveTab('articles');
@@ -134,15 +172,26 @@ export const AdminBlogPage: React.FC = () => {
     }
   };
 
-  const handleCreateCategory = async (e: React.FormEvent) => {
+  const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.categories.create({
-        name: newCatName,
-        slug: newCatSlug || newCatName.toLowerCase().replace(/\s+/g, '-'),
-        description: newCatDesc,
-      });
-      setMessage({ text: 'دسته‌بندی با موفقیت ایجاد شد.' });
+      const slugVal = newCatSlug || newCatName.toLowerCase().replace(/\s+/g, '-');
+      if (editingCatId) {
+        await api.categories.update(editingCatId, {
+          name: newCatName,
+          slug: slugVal,
+          description: newCatDesc,
+        });
+        setMessage({ text: 'دسته‌بندی به‌روزرسانی شد.' });
+      } else {
+        await api.categories.create({
+          name: newCatName,
+          slug: slugVal,
+          description: newCatDesc,
+        });
+        setMessage({ text: 'دسته‌بندی با موفقیت ایجاد شد.' });
+      }
+      setEditingCatId(null);
       setNewCatName('');
       setNewCatSlug('');
       setNewCatDesc('');
@@ -163,11 +212,13 @@ export const AdminBlogPage: React.FC = () => {
     }
   };
 
-  const filteredArticles = articles.filter(
-    (a) =>
+  const filteredArticles = articles.filter((a) => {
+    const matchesSearch =
       a.title.toLowerCase().includes(search.toLowerCase()) ||
-      a.slug.toLowerCase().includes(search.toLowerCase())
-  );
+      a.slug.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || a.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <AdminLayout>
@@ -177,7 +228,7 @@ export const AdminBlogPage: React.FC = () => {
           <div>
             <h1 className="text-2xl font-black text-navy-950 font-vazir">سیستم انتشارات و دانشنامه معدنی</h1>
             <p className="text-xs text-slate-500 font-light mt-1">
-              مدیریت یادداشت‌های تخصصی، دسته‌بندی‌ها، برچسب‌ها و فلوشیت‌های دانشنامه‌ای
+              مدیریت مقالات تخصصی، متادیتای سئو، دسته‌بندی‌ها و پیش‌نویس‌های متالورژیکی
             </p>
           </div>
 
@@ -190,7 +241,7 @@ export const AdminBlogPage: React.FC = () => {
                   : 'bg-white border border-[#E3DAD0] text-slate-700 hover:border-[#0F1821]'
               }`}
             >
-              فهرست مقالات
+              فهرست مقالات ({articles.length})
             </button>
             <button
               onClick={openNewArticle}
@@ -201,7 +252,7 @@ export const AdminBlogPage: React.FC = () => {
               }`}
             >
               <Plus className="w-4 h-4" />
-              <span>{editArticleId ? 'ویرایش مقاله' : 'نگارش مطلب'}</span>
+              <span>{editArticleId ? 'ویرایش مقاله' : 'نگارش مطلب جدید'}</span>
             </button>
             <button
               onClick={() => setActiveTab('taxonomy')}
@@ -211,7 +262,7 @@ export const AdminBlogPage: React.FC = () => {
                   : 'bg-white border border-[#E3DAD0] text-slate-700 hover:border-[#0F1821]'
               }`}
             >
-              دسته‌بندی‌ها
+              دسته‌بندی‌ها ({categories.length})
             </button>
           </div>
         </div>
@@ -235,7 +286,7 @@ export const AdminBlogPage: React.FC = () => {
         {/* TAB 1: ARTICLES LIST */}
         {activeTab === 'articles' && (
           <div className="space-y-4">
-            <div className="bg-white p-4 rounded-2xl border border-[#E3DAD0] shadow-card flex items-center justify-between gap-4">
+            <div className="bg-white p-4 rounded-2xl border border-[#E3DAD0] shadow-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
               <div className="relative flex-1 max-w-sm">
                 <input
                   type="text"
@@ -246,7 +297,22 @@ export const AdminBlogPage: React.FC = () => {
                 />
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               </div>
-              <span className="text-xs text-slate-500 font-mono">{filteredArticles.length} ARTICLES</span>
+
+              {/* Status Filter */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">وضعیت:</span>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="p-2 rounded-xl border border-[#E3DAD0] bg-white text-xs text-navy-950 focus:outline-none focus:border-[#0F1821]"
+                >
+                  <option value="all">همه وضعیت‌ها</option>
+                  <option value="published">منتشرشده</option>
+                  <option value="draft">پیش‌نویس</option>
+                  <option value="scheduled">زمان‌بندی‌شده</option>
+                </select>
+                <span className="text-xs text-slate-500 font-mono mr-2">{filteredArticles.length} مورد</span>
+              </div>
             </div>
 
             <div className="bg-white rounded-2xl border border-[#E3DAD0] shadow-card overflow-hidden">
@@ -289,24 +355,32 @@ export const AdminBlogPage: React.FC = () => {
                             className={`px-2 py-0.5 rounded-[6px] text-[10px] font-bold ${
                               art.status === 'published'
                                 ? 'bg-emerald-100 text-emerald-800'
+                                : art.status === 'scheduled'
+                                ? 'bg-blue-100 text-blue-800'
                                 : 'bg-amber-100 text-amber-800'
                             }`}
                           >
-                            {art.status === 'published' ? 'منتشرشده' : 'پیش‌نویس'}
+                            {art.status === 'published'
+                              ? 'منتشرشده'
+                              : art.status === 'scheduled'
+                              ? 'زمان‌بندی‌شده'
+                              : 'پیش‌نویس'}
                           </span>
                         </td>
                         <td className="p-4 font-mono text-slate-500">{art.reading_time}</td>
                         <td className="p-4 text-center">
                           <div className="flex items-center justify-center gap-2">
-                            <a
-                              href={`/blog/${art.slug}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-navy-950 hover:bg-slate-100"
-                              title="مشاهده زنده"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
+                            {art.status === 'published' && (
+                              <a
+                                href={`/blog/${art.slug}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-navy-950 hover:bg-slate-100"
+                                title="مشاهده زنده"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            )}
                             <button
                               onClick={() => openEditArticle(art.id)}
                               className="p-1.5 rounded-lg text-slate-600 hover:text-[#0F1821] hover:bg-slate-100"
@@ -335,9 +409,34 @@ export const AdminBlogPage: React.FC = () => {
         {/* TAB 2: ARTICLE EDITOR */}
         {activeTab === 'editor' && (
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E3DAD0] shadow-card">
-            <h2 className="text-base font-bold text-navy-950 font-vazir mb-6 pb-3 border-b border-[#E3DAD0]">
-              {editArticleId ? 'ویرایش و بازبینی مقاله' : 'نگارش و انتشار مقاله جدید'}
-            </h2>
+            <div className="flex items-center justify-between pb-3 mb-6 border-b border-[#E3DAD0]">
+              <h2 className="text-base font-bold text-navy-950 font-vazir">
+                {editArticleId ? 'ویرایش و بازبینی مقاله' : 'نگارش و انتشار مقاله جدید'}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setPreviewOpen(!previewOpen)}
+                className="px-3.5 py-1.5 rounded-[10px] bg-brand-sand border border-[#E3DAD0] text-xs font-bold text-navy-950 hover:border-navy-950 flex items-center gap-1.5 transition-colors"
+              >
+                <Eye className="w-4 h-4 text-[#EFA73F]" />
+                <span>{previewOpen ? 'بستن پیش‌نمایش' : 'پیش‌نمایش خروجی'}</span>
+              </button>
+            </div>
+
+            {/* Live Preview Box */}
+            {previewOpen && (
+              <div className="mb-8 p-6 rounded-2xl bg-[#FAF7F3] border-2 border-dashed border-[#E3DAD0] space-y-4">
+                <span className="text-xs font-mono font-bold text-[#EFA73F] block">PREVIEW MODE // پیش‌نمایش زنده</span>
+                <h1 className="text-2xl font-black font-vazir text-navy-950">{articleForm.title || 'عنوان پیش‌نمایش'}</h1>
+                <p className="text-xs sm:text-sm text-slate-600 italic bg-white p-4 rounded-xl border border-[#E3DAD0]">
+                  {articleForm.summary || 'چکیده مقاله در اینجا نمایش داده می‌شود...'}
+                </p>
+                <div
+                  className="prose prose-slate max-w-none bg-white p-6 rounded-xl border border-[#E3DAD0] text-xs sm:text-sm"
+                  dangerouslySetInnerHTML={{ __html: articleForm.content_html || '<p class="text-slate-400">متن مقاله هنوز وارد نشده است.</p>' }}
+                />
+              </div>
+            )}
 
             <form onSubmit={handleSaveArticle} className="space-y-5 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -379,19 +478,100 @@ export const AdminBlogPage: React.FC = () => {
                 />
               </div>
 
+              {/* Rich Content Editor Toolbar */}
               <div>
-                <label className="block font-bold text-navy-950 mb-1">متن کامل مقاله (HTML / Rich Format) *</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-navy-950">متن کامل مقاله (HTML / Rich Format) *</label>
+                  <span className="text-[11px] text-slate-400">نوار ابزار قالب‌بندی سریع:</span>
+                </div>
+
+                <div className="p-2 bg-slate-50 border border-[#E3DAD0] rounded-t-xl flex flex-wrap items-center gap-1.5 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => insertSnippet('<h2>تیتر بخش اصلی</h2>\n<p>توضیحات این بخش...</p>')}
+                    className="px-2.5 py-1 rounded bg-white border border-[#E3DAD0] hover:bg-slate-100 flex items-center gap-1 font-bold"
+                    title="افزودن تیتر H2"
+                  >
+                    <Heading className="w-3.5 h-3.5 text-navy-950" />
+                    <span>H2</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertSnippet('<h3>زیرعنوان فرعی</h3>\n<p>جزئیات تکمیلی...</p>')}
+                    className="px-2.5 py-1 rounded bg-white border border-[#E3DAD0] hover:bg-slate-100 flex items-center gap-1 font-medium"
+                    title="افزودن تیتر H3"
+                  >
+                    <span>H3</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertSnippet('<strong>متن برجسته</strong>')}
+                    className="px-2.5 py-1 rounded bg-white border border-[#E3DAD0] hover:bg-slate-100 flex items-center gap-1 font-bold"
+                    title="متن ضخیم"
+                  >
+                    <Bold className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertSnippet('<em>متن مورب</em>')}
+                    className="px-2.5 py-1 rounded bg-white border border-[#E3DAD0] hover:bg-slate-100 flex items-center gap-1 italic"
+                    title="متن ایتالیک"
+                  >
+                    <Italic className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertSnippet('<ul>\n  <li>آیتم اول</li>\n  <li>آیتم دوم</li>\n</ul>')}
+                    className="px-2.5 py-1 rounded bg-white border border-[#E3DAD0] hover:bg-slate-100 flex items-center gap-1"
+                    title="لیست بالت‌دار"
+                  >
+                    <List className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertSnippet('<blockquote>نقل قول فنی مهندسی یا نکته کلیدی عملیات...</blockquote>')}
+                    className="px-2.5 py-1 rounded bg-white border border-[#E3DAD0] hover:bg-slate-100 flex items-center gap-1"
+                    title="باکس نقل قول"
+                  >
+                    <Quote className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertSnippet('<table class="w-full text-right border my-4 text-xs">\n  <thead><tr class="bg-slate-100"><th>شاخص</th><th>مقدار</th></tr></thead>\n  <tbody><tr><td>عیار خوراک</td><td>۶۲٪</td></tr></tbody>\n</table>')}
+                    className="px-2.5 py-1 rounded bg-white border border-[#E3DAD0] hover:bg-slate-100 flex items-center gap-1"
+                    title="جدول داده"
+                  >
+                    <TableIcon className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertSnippet('<a href="/platform" class="text-[#EFA73F] font-bold underline">مشاهده سامانه فرآوری</a>')}
+                    className="px-2.5 py-1 rounded bg-white border border-[#E3DAD0] hover:bg-slate-100 flex items-center gap-1"
+                    title="پیوند درون‌متنی"
+                  >
+                    <LinkIcon className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertSnippet('<img src="/images/hero/hero-flowsheet.svg" alt="نمودار فلوشیت" class="w-full rounded-xl border my-4" />')}
+                    className="px-2.5 py-1 rounded bg-white border border-[#E3DAD0] hover:bg-slate-100 flex items-center gap-1"
+                    title="تصویر"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
                 <textarea
-                  rows={12}
+                  rows={14}
                   required
                   value={articleForm.content_html}
                   onChange={(e) => setArticleForm({ ...articleForm, content_html: e.target.value })}
-                  className="w-full p-3 rounded-xl border border-[#E3DAD0] font-mono text-xs focus:outline-none focus:border-[#0F1821] bg-slate-50/50"
+                  className="w-full p-3 rounded-b-xl border border-[#E3DAD0] border-t-0 font-mono text-xs focus:outline-none focus:border-[#0F1821] bg-slate-50/40"
                   placeholder="<h2>مقدمه</h2><p>متن بخش اول...</p>"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div>
                   <label className="block font-bold text-navy-950 mb-1">دسته‌بندی موضوعی</label>
                   <select
@@ -406,6 +586,16 @@ export const AdminBlogPage: React.FC = () => {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-navy-950 mb-1">نویسنده مقاله</label>
+                  <input
+                    type="text"
+                    value={articleForm.author_name}
+                    onChange={(e) => setArticleForm({ ...articleForm, author_name: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-[#E3DAD0] focus:outline-none focus:border-[#0F1821]"
+                  />
                 </div>
 
                 <div>
@@ -427,6 +617,7 @@ export const AdminBlogPage: React.FC = () => {
                   >
                     <option value="published">منتشرشده (Published)</option>
                     <option value="draft">پیش‌نویس (Draft)</option>
+                    <option value="scheduled">زمان‌بندی‌شده (Scheduled)</option>
                   </select>
                 </div>
               </div>
@@ -458,7 +649,7 @@ export const AdminBlogPage: React.FC = () => {
               {/* SEO Box */}
               <div className="p-4 rounded-2xl bg-brand-sandLight border border-[#E3DAD0] space-y-3">
                 <span className="font-bold text-navy-950 block border-b border-[#E3DAD0]/70 pb-1">
-                  تنظیمات سئو برای این مقاله
+                  تنظیمات متادیتای سئو (Technical SEO Metadata)
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -508,7 +699,7 @@ export const AdminBlogPage: React.FC = () => {
                   type="submit"
                   className="px-6 py-2.5 rounded-[10px] bg-[#EFA73F] text-navy-950 font-bold hover:bg-[#D48E28] transition-colors shadow-xs"
                 >
-                  ذخیره و انتشار مقاله
+                  ذخیره و ثبت مقاله
                 </button>
               </div>
             </form>
@@ -518,13 +709,13 @@ export const AdminBlogPage: React.FC = () => {
         {/* TAB 3: CATEGORIES MANAGEMENT */}
         {activeTab === 'taxonomy' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Create Category (5 cols) */}
+            {/* Create / Edit Category (5 cols) */}
             <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-[#E3DAD0] shadow-card">
               <h2 className="text-sm font-bold text-navy-950 font-vazir mb-4 pb-2 border-b border-[#E3DAD0]">
-                افزودن دسته‌بندی جدید
+                {editingCatId ? 'ویرایش دسته‌بندی' : 'افزودن دسته‌بندی جدید'}
               </h2>
 
-              <form onSubmit={handleCreateCategory} className="space-y-4 text-xs">
+              <form onSubmit={handleSaveCategory} className="space-y-4 text-xs">
                 <div>
                   <label className="block font-bold text-navy-950 mb-1">نام دسته‌بندی *</label>
                   <input
@@ -559,12 +750,28 @@ export const AdminBlogPage: React.FC = () => {
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-2.5 px-4 rounded-[10px] bg-[#EFA73F] text-navy-950 font-bold hover:bg-[#D48E28] transition-colors"
-                >
-                  ثبت دسته‌بندی
-                </button>
+                <div className="flex items-center gap-2 pt-2">
+                  {editingCatId && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingCatId(null);
+                        setNewCatName('');
+                        setNewCatSlug('');
+                        setNewCatDesc('');
+                      }}
+                      className="w-1/3 py-2.5 px-3 rounded-[10px] bg-slate-100 text-slate-700 font-bold hover:bg-slate-200"
+                    >
+                      انصراف
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="flex-1 py-2.5 px-4 rounded-[10px] bg-[#EFA73F] text-navy-950 font-bold hover:bg-[#D48E28] transition-colors"
+                  >
+                    {editingCatId ? 'ذخیره تغییرات' : 'ثبت دسته‌بندی'}
+                  </button>
+                </div>
               </form>
             </div>
 
@@ -586,10 +793,22 @@ export const AdminBlogPage: React.FC = () => {
                       {c.description && <p className="text-[11px] text-slate-600 mt-0.5">{c.description}</p>}
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <span className="px-2 py-0.5 rounded-[6px] bg-white border border-[#E3DAD0] font-mono text-[10px]">
                         {c.articles_count || 0} مقاله
                       </span>
+                      <button
+                        onClick={() => {
+                          setEditingCatId(c.id);
+                          setNewCatName(c.name);
+                          setNewCatSlug(c.slug);
+                          setNewCatDesc(c.description || '');
+                        }}
+                        className="p-1 rounded text-slate-600 hover:text-navy-950"
+                        title="ویرایش"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={() => handleDeleteCategory(c.id, c.name)}
                         className="p-1 rounded text-rose-500 hover:text-rose-700"

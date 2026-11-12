@@ -686,42 +686,192 @@ export const AdminPagesPage: React.FC = () => {
                         let sampleConfig: any = {};
                         if (newType === 'hero') {
                           sampleConfig = {
-                            badge: 'فناوری داده در خدمت معدن',
-                            title: 'عنوان بزرگ هیرو',
-                            subtitle: 'توضیحات کوتاه زیر عنوان',
-                            primaryCtaText: 'مشاهده سامانه',
-                            primaryCtaUrl: '/platform',
+                            tagline: 'سامانه مانیتورینگ متالورژی معدنکو',
+                            title: 'عنوان اصلی هیرو بخش',
+                            subtitle: 'توضیحات تکمیلی پیرامون راهکارها و موازنه جرم کارخانه',
+                            primaryCtaText: 'آشنایی با سامانه',
+                            primaryCtaLink: '/platform',
+                            secondaryCtaText: 'تماس با ما',
+                            secondaryCtaLink: '/contact',
                           };
                         } else if (newType === 'features') {
                           sampleConfig = {
-                            title: 'ویژگی‌های کلیدی',
-                            subtitle: 'مزایای فنی و متالورژیکی',
+                            tagline: 'قابلیت‌های کلیدی',
+                            title: 'ویژگی‌های مهندسی',
+                            subtitle: 'امکانات برجسته برای مدیران و سرپرستان فرآوری',
                             items: [
-                              { title: 'عنوان ویژگی اول', description: 'توضیح کوتاه', icon: 'Database' },
-                              { title: 'عنوان ویژگی دوم', description: 'توضیح کوتاه', icon: 'Cpu' },
+                              { title: 'پایش برخط عیار و بازیابی', description: 'ثبت خودکار داده‌های آزمایشگاهی و سنسوری', icon: 'Database' },
+                              { title: 'موازنه جرم دو و سه‌محصولی', description: 'محاسبه فوری خطای اندازه‌گیری و دبی جریان', icon: 'Cpu' },
                             ],
                           };
                         } else if (newType === 'stats') {
                           sampleConfig = {
-                            title: 'آمار و دستاوردها',
+                            title: 'آمار و شاخص‌های عملیاتی',
+                            subtitle: 'معیارهای قابل سنجش عملکرد کارخانجات',
                             items: [
-                              { value: '۱۰۰٪', label: 'دسترسی محلی', sub: 'شبکه کارخانه' },
-                              { value: '۰٫۵٪+', label: 'افزایش بازیابی', sub: 'سودآوری خط' },
+                              { value: '۱۰۰٪', label: 'دسترسی امن داخلی', sub: 'بدون نیاز به اینترنت خارجی' },
+                              { value: '۰٫۵٪+', label: 'افزایش بازیابی', sub: 'سودآوری خط فرآوری' },
+                              { value: '۲۴/۷', label: 'پایش بلادرنگ', sub: 'شناسایی نوسانات خط' },
                             ],
                           };
                         } else if (newType === 'faq') {
                           sampleConfig = {
                             title: 'پرسش‌های متداول',
-                            subtitle: 'پاسخ به سوالات فنی',
-                            items: [{ q: 'پرسش اول؟', a: 'پاسخ به پرسش اول...' }],
+                            subtitle: 'پاسخ به سوالات فنی و اجرایی',
+                            items: [
+                              { q: 'آیا سامانه نیاز به اتصال اینترنت دارد؟', a: 'خیر، سامانه به صورت کاملاً ایزوله روی سرور محلی کارخانه (On-Premises) نصب می‌شود.' },
+                              { q: 'پشتیبانی فنی به چه صورت است؟', a: 'تیم مهندسی معدنکو به صورت دوره‌ای و پشتیبانی برخط پاسخگوی نیازهای کارخانه است.' },
+                            ],
                           };
                         } else if (newType === 'cta') {
                           sampleConfig = {
-                            title: 'آماده ارتقای کارخانه خود هستید؟',
-                            subtitle: 'با کارشناسان ما تماس حاصل فرمایید',
+                            title: 'آماده ارتقای کارخانه و یکپارچگی داده‌ها هستید؟',
+                            subtitle: 'جهت بررسی فلوشیت و هماهنگی جلسه فنی با کارشناسان ما تماس بگیرید.',
                             buttonText: 'تماس با ما',
                             buttonUrl: '/contact',
                             phone: '09999196630',
+                          };
+                        } else if (newType === 'image') {
+                          sampleConfig = {
+                            imageUrl: '/images/hero/hero-flowsheet.svg',
+                            caption: 'نمودار جریان فرآیند (PFD) و ایستگاه‌های داده‌گیری',
+                            altText: 'فلوشیت خط فرآوری معدنکو',
+                            fullWidth: false,
+                          };
+                        } else if (newType === 'image_text') {
+                          sampleConfig = {
+                            tagline: 'راهکار تخصصی',
+                            title: 'یکپارچه‌سازی گزارش‌های روزانه متالورژی',
+                            description: 'حذف خطاهای انسانی در ثبت دستی و گردآوری داده‌های شیفت با سامانه‌ای یکپارچه.',
+                            bulletPoints: [
+                              'محاسبه خودکار شاخص‌های کلیدی عملکرد (KPIs)',
+                              'ثبت داده‌های توزیع ابعادی سرند و هیدروسیکلون‌ها',
+                              'گزارش‌گیری مدیریتی با یک کلیک',
+                            ],
+                            imageUrl: '/images/hero/hero-flowsheet.svg',
+                            imagePosition: 'left',
+                            ctaText: 'مشاهده سامانه',
+                            ctaLink: '/platform',
+                          };
+                        } else if (newType === 'video') {
+                          sampleConfig = {
+                            tagline: 'ویدیو آموزشی',
+                            title: 'آشنایی با ماژول موازنه جرم معدنکو',
+                            description: 'بررسی نحوه برازش داده‌ها و تحلیل خطاهای نمونه‌برداری',
+                            videoUrl: 'https://www.aparat.com',
+                          };
+                        } else if (newType === 'logo_cloud') {
+                          sampleConfig = {
+                            tagline: 'تجهیزات و استانداردهای تحت پوشش',
+                            title: 'سازگار با انواع تجهیزات خردایش و فلوتاسیون',
+                            items: [
+                              { name: 'سنگ‌شکن فکی و مخروطی', subtitle: 'Primary & Secondary Crushing' },
+                              { name: 'آسیای نیمه‌خودشکن (SAG)', subtitle: 'Comminution Circuit' },
+                              { name: 'سلول‌های فلوتاسیون ستونی و مکانیکی', subtitle: 'Flotation Cells' },
+                              { name: 'هیدروسیکلون و دانه‌بندی', subtitle: 'Classification System' },
+                            ],
+                          };
+                        } else if (newType === 'testimonials') {
+                          sampleConfig = {
+                            tagline: 'نظرات مدیران و کارشناسان',
+                            title: 'بازخورد استقرار در مجتمع‌های صنعتی',
+                            subtitle: 'روایت بهره‌وری از نگاه سرپرستان فرآوری',
+                            items: [
+                              {
+                                quote: 'دقت در ثبت داده‌ها و تشخیص سریع نوسان عیار باطله، ریکاوری خط ما را به شکل محسوسی بهبود داد.',
+                                author: 'مهندس ناظر فرآوری',
+                                role: 'سرپرست خط متالورژی',
+                                company: 'کارخانه فرآوری سنگ‌آهن',
+                              },
+                            ],
+                          };
+                        } else if (newType === 'cards') {
+                          sampleConfig = {
+                            tagline: 'خدمات محوری',
+                            title: 'حوزه‌های تخصصی فعالیت معدنکو',
+                            subtitle: 'ارائه راهکارهای جامع داده‌محور در صنایع معدنی',
+                            columns: 3,
+                            cards: [
+                              {
+                                title: 'مدیریت داده‌های عملیاتی',
+                                description: 'ساختارمندسازی لاگ‌های تولیدی و آزمایشگاهی شیفت',
+                                badge: 'پایه',
+                                link: '/services/industrial-data-management',
+                                linkText: 'مشاهده جزئیات',
+                              },
+                              {
+                                title: 'موازنه جرم و متالورژی',
+                                description: 'محاسبه خطای داده‌ها و بازیابی واقعی کارخانه',
+                                badge: 'تخصصی',
+                                link: '/services/process-performance-evaluation',
+                                linkText: 'مشاهده جزئیات',
+                              },
+                              {
+                                title: 'داشبوردهای مدیریتی برخط',
+                                description: 'نمایش شاخص‌های عملکردی بدون نیاز به اینترنت خارجی',
+                                badge: 'تحلیلی',
+                                link: '/services/industrial-dashboard-design',
+                                linkText: 'مشاهده جزئیات',
+                              },
+                            ],
+                          };
+                        } else if (newType === 'contact_info') {
+                          sampleConfig = {
+                            tagline: 'راه‌های ارتباطی',
+                            title: 'پل ارتباطی با شرکت معدنکو',
+                            description: 'کارشناسان ما آماده پاسخگویی به درخواست‌های فنی کارخانجات هستند.',
+                            phone: '09999196630',
+                            email: 'info@madan.co.ir',
+                            address: 'تهران، تهران نیرو دریایی',
+                            platformUrl: 'https://madan.ba3tani.ir',
+                          };
+                        } else if (newType === 'team') {
+                          sampleConfig = {
+                            tagline: 'تیم تخصصی',
+                            title: 'هیئت مهندسی و تحقیق و توسعه معدنکو',
+                            subtitle: 'متخصصان پردازش داده، متالورژی استخراجی و سیستم‌های ابزاردقیق',
+                            members: [
+                              {
+                                name: 'تیم فنی فرآوری و متالورژی',
+                                role: 'طراحی الگوریتم‌ها و موازنه جرم',
+                                education: 'دانشگاه تهران / دانشگاه تربیت مدرس',
+                                bio: 'متخصص در بهینه‌سازی مدارهای فلوتاسیون و خردایش',
+                              },
+                              {
+                                name: 'تیم توسعه نرم‌افزار و داده',
+                                role: 'زیرساخت پردازش برخط و امنیت',
+                                education: 'مهندسی نرم‌افزار و هوش مصنوعی',
+                                bio: 'توسعه‌دهنده معماری ایزوله و پرسرعت برای محیط‌های صنعتی',
+                              },
+                            ],
+                          };
+                        } else if (newType === 'showcase') {
+                          sampleConfig = {
+                            tagline: 'سامانه اختصاصی معدنکو',
+                            title: 'نرم‌افزار مانیتورینگ و ارزیابی عملیات فرآوری',
+                            description: 'پلتفرم بومی جهت محاسبه دقیق متالورژیکی بدون وابستگی خارجی',
+                            features: ['موازنه جرم پیوسته', 'نمایش برخط بالانس آب و باطله', 'پشتیبانی از تجهیزات متنوع'],
+                            ctaUrl: 'https://madan.ba3tani.ir',
+                            ctaText: 'ورود به سامانه آنلاین',
+                          };
+                        } else if (newType === 'table') {
+                          sampleConfig = {
+                            title: 'مقایسه شاخص‌های کلیدی قبل و بعد از استقرار',
+                            headers: ['شاخص متالورژیکی', 'روش سنتی (اکسل)', 'با سامانه معدنکو'],
+                            rows: [
+                              ['زمان محاسبه موازنه شیفت', '۳ ساعت پس از شیفت', 'لحظه‌ای و خودکار'],
+                              ['خطای ثبت داده‌های آزمایشگاهی', 'بالای ۸ درصد', 'کمتر از ۰٫۵ درصد'],
+                              ['شناسایی گلوگاه‌های خردایش', 'پس از توقف خط', 'هشدار زودهنگام هوشمند'],
+                            ],
+                          };
+                        } else if (newType === 'downloads') {
+                          sampleConfig = {
+                            tagline: 'اسناد و مستندات',
+                            title: 'مرکز دانلود کاتالوگ و مشخصات فنی',
+                            items: [
+                              { title: 'کاتالوگ جامع سامانه ارزیابی نوین', size: '۴٫۲ مگابایت', format: 'PDF', url: '/downloads/madanco-brochure.pdf' },
+                              { title: 'راهنمای ثبت داده‌های فلوتاسیون', size: '۱٫۸ مگابایت', format: 'PDF', url: '/downloads/flotation-guide.pdf' },
+                            ],
                           };
                         } else {
                           sampleConfig = {
@@ -738,13 +888,22 @@ export const AdminPagesPage: React.FC = () => {
                       className="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none"
                     >
                       <option value="hero">هیرو (Hero Block)</option>
+                      <option value="text">متن و توضیحات (Text Block)</option>
+                      <option value="image">تک تصویر عریض (Image Block)</option>
+                      <option value="image_text">تصویر و متن ترکیبی (Image + Text Block)</option>
                       <option value="features">کارت‌های ویژگی (Features Block)</option>
                       <option value="stats">آمار و ارقام (Stats Block)</option>
-                      <option value="text">متن و توضیحات (Text Block)</option>
+                      <option value="cards">شبکه کارت‌های راهکار (Cards Block)</option>
+                      <option value="showcase">نمایش سامانه و محصول (Showcase Block)</option>
+                      <option value="table">جدول اطلاعاتی فنی (Table Block)</option>
                       <option value="faq">سوالات متداول (FAQ Block)</option>
                       <option value="cta">فراخوان اقدام (CTA Block)</option>
-                      <option value="showcase">نمایش محصول (Showcase Block)</option>
-                      <option value="table">جدول اطلاعاتی (Table Block)</option>
+                      <option value="contact_info">باکس اطلاعات تماس (Contact Info Block)</option>
+                      <option value="team">معرفی تیم مهندسی (Team Block)</option>
+                      <option value="testimonials">نظرات و دیدگاه‌ها (Testimonials Block)</option>
+                      <option value="logo_cloud">شبکه نمادها و تجهیزات (Logo Cloud Block)</option>
+                      <option value="video">ویدیو و مالتی‌مدیا (Video Block)</option>
+                      <option value="downloads">مرکز دانلود اسناد (Downloads Block)</option>
                       <option value="html">کد سفارشی (Custom HTML)</option>
                     </select>
                   </div>

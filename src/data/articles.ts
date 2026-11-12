@@ -1,17 +1,42 @@
 import { ArticleItem } from '../types';
+import { technicalArticles } from './technicalArticles';
+
+const categoryMap: Record<string, string> = {
+  'metallurgy-mass-balance': 'متالورژی و موازنه جرم',
+  'comminution-milling': 'خردایش و آسیاکنی',
+  'separation-flotation': 'فلوتاسیون و جدایش',
+  'plant-operations-qc': 'عملیات کارخانه و کنترل کیفیت',
+  'industrial-data-analytics': 'مدیریت و تحلیل داده صنعتی',
+};
 
 export const articleCategories = [
   'همه مقالات',
+  'متالورژی و موازنه جرم',
+  'خردایش و آسیاکنی',
+  'فلوتاسیون و جدایش',
+  'عملیات کارخانه و کنترل کیفیت',
+  'مدیریت و تحلیل داده صنعتی',
   'تحلیل داده در معدن',
   'فرآوری مواد معدنی',
   'هوشمندسازی معدن',
-  'مهندسی داده',
-  'فناوری‌های صنعتی',
-  'ارزیابی عملکرد خطوط فرآوری',
-  'تحول دیجیتال در صنایع معدنی',
 ];
 
-export const articlesData: ArticleItem[] = [
+const mappedTechnicalArticles: ArticleItem[] = technicalArticles.map((t, idx) => ({
+  id: `tech-${idx + 1}`,
+  slug: t.slug,
+  title: t.title,
+  summary: t.summary,
+  category: categoryMap[t.category_slug] || 'فرآوری مواد معدنی',
+  author: t.author || 'واحد متالورژی و تحلیل فرآیند معدنکو',
+  publishedAt: t.published_at || '۱۴۰۳/۰۸/۰۱',
+  readingTime: t.reading_time || '۷ دقیقه',
+  status: 'published' as const,
+  tags: t.tags || [],
+  tableOfContents: [],
+  contentHtml: t.content_html || '',
+}));
+
+const baseArticles: ArticleItem[] = [
   {
     id: 'art-1',
     slug: 'role-of-data-analytics-in-mineral-processing-performance',
@@ -192,4 +217,9 @@ export const articlesData: ArticleItem[] = [
       },
     ],
   },
+];
+
+export const articlesData: ArticleItem[] = [
+  ...mappedTechnicalArticles,
+  ...baseArticles,
 ];

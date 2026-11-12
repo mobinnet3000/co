@@ -2,12 +2,15 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { DatabaseSync } from 'node:sqlite';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const dbPath = path.resolve(__dirname, '../server/data/madanco.sqlite');
-const backupDir = path.resolve(__dirname, '../server/backups');
+const dbPath = process.env.DATABASE_PATH || process.env.DB_PATH || path.resolve(__dirname, '../server/data/madanco.sqlite');
+const backupDir = process.env.BACKUP_DIR || path.resolve(path.dirname(dbPath), 'backups');
 
 if (!fs.existsSync(dbPath)) {
   console.error(`Database file not found at: ${dbPath}`);

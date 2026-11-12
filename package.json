@@ -3,13 +3,21 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"yellow,cyan\" \"npm run server\" \"vite\"",
     "dev:client": "vite",
     "server": "tsx server/src/index.ts",
-    "build": "tsc && vite build && node scripts/prerender.js",
+    "build:client": "tsc && vite build && node scripts/prerender.js",
+    "build:server": "esbuild server/src/index.ts --bundle --platform=node --format=esm --target=node22 --outfile=server/dist/index.js --packages=external",
+    "build": "tsc && vite build && node scripts/prerender.js && npm run build:server",
+    "start": "node app.js",
     "preview": "vite preview",
     "test:backend": "tsx --test server/test/backend.test.ts",
+    "package:cpanel": "node scripts/build-package.js",
+    "admin:reset-password": "node scripts/reset-admin-password.js",
     "db:backup": "node scripts/backup-db.js",
     "db:restore": "node scripts/restore-db.js"
   },

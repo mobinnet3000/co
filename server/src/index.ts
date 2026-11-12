@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { config } from './config';
 import { initDatabase } from './db/database';
 import { seedDatabase } from './db/seed';
@@ -53,7 +54,16 @@ app.use('/uploads', express.static(config.uploadsDir));
 app.get('/sitemap.xml', seoController.getSitemapXml);
 app.get('/robots.txt', seoController.getRobotsTxt);
 
-// Health check endpoint
+// Health check endpoints (both /health and /api/health)
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    service: 'MadanCo Corporate Platform',
+    version: '1.0.0',
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
@@ -78,17 +88,67 @@ app.use('/api/seo', seoRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/search', searchRoutes);
 
+// Catch-all 404 for unknown /api/* requests (NEVER return HTML for API requests)
+app.use('/api', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'مسیر API مورد نظر یافت نشد (API endpoint not found)',
+    path: req.originalUrl,
+  });
+});
+
 // Error handling middleware
 app.use(errorHandler);
+
+// Production Frontend Static & SPA Serving (when dist exists)
+if (fs.existsSync(config.distDir)) {
+  // 1. Serve static assets with caching
+  app.use(express.static(config.distDir, {
+    index: false,
+    maxAge: config.nodeEnv === 'production' ? '7d' : 0,
+  }));
+
+  // 2. Prerendered HTML checks & SPA fallback for GET requests
+  app.use((req, res, next) => {
+    if (req.method !== 'GET') {
+      return next();
+    }
+
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+
+    // Check if an exact prerendered HTML file exists for this route (e.g. dist/about/index.html)
+    const cleanPath = req.path.replace(/^\/|\/$/g, '');
+    if (cleanPath) {
+      const prerenderedPath = path.join(config.distDir, cleanPath, 'index.html');
+      if (fs.existsSync(prerenderedPath)) {
+        return res.sendFile(prerenderedPath);
+      }
+    }
+
+    // Default SPA fallback
+    const indexPath = path.join(config.distDir, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+
+    next();
+  });
+}
 
 // Start server if executed directly (and not in node test runner)
 const isTestRunner = process.env.NODE_ENV === 'test' || process.env.NODE_TEST_CONTEXT !== undefined || process.argv.some(arg => arg.includes('test'));
 if (!isTestRunner) {
   app.listen(config.port, '0.0.0.0', () => {
     console.log(`=======================================================`);
-    console.log(`✓ MadanCo Production Backend running on port ${config.port}`);
-    console.log(`✓ Database: SQLite (Node.js 24 Native WAL Mode)`);
-    console.log(`✓ API Health: http://localhost:${config.port}/api/health`);
+    console.log(`✓ MadanCo Production Server running on port ${config.port}`);
+    console.log(`✓ Environment: ${config.nodeEnv}`);
+    console.log(`✓ Database: SQLite (WAL Mode enabled)`);
+    console.log(`✓ Frontend: Serving from ${config.distDir}`);
+    console.log(`✓ Health: http://localhost:${config.port}/health`);
     console.log(`=======================================================`);
   });
 }
+
+export default app;
