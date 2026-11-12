@@ -38,15 +38,15 @@ export const companyData: CompanyInfo = {
     registrationNumber: undefined, // [در انتظار درج شماره ثبت رسمی]
     nationalId: undefined,         // [در انتظار درج شناسه ملی]
     establishmentYear: undefined,  // [در انتظار تایید سال تاسیس]
-    address: 'دفتر مرکزی: تهران (نشانی دقیق پس از استقرار نهایی به‌روزرسانی می‌شود)',
-    phone: undefined,              // شماره تماس رسمی پس از تایید نهایی درج می‌شود
-    email: 'info@novin-amaliat.ir', // ایمیل سازمانی رسمی
-    workingHours: 'شنبه تا چهارشنبه: ۸:۰۰ الی ۱۶:۳۰',
+    address: 'تهران، نیروی دریایی',
+    phone: '09999196630',
+    email: 'info@madan.co.ir',
+    workingHours: 'شنبه تا چهارشنبه: ۸:۰۰ الی ۱۷:۰۰',
     postalCode: undefined,
   },
   socials: {
-    linkedin: 'https://linkedin.com/company/novin-industrial-data',
-    telegram: undefined,
-    whatsapp: undefined,
+    linkedin: 'https://linkedin.com/company/madan-co',
+    telegram: 'https://t.me/madanco_ir',
+    whatsapp: 'https://wa.me/989999196630',
   },
 };

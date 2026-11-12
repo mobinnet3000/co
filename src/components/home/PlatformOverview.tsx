@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowLeft, Database, Sliders, LineChart, FileText, Activity } from 'lucide-react';
 import { Button } from '../common/Button';
@@ -170,15 +171,25 @@ export const PlatformOverview: React.FC = () => {
             </p>
           </div>
 
-          <Button
-            to="/platform"
-            variant="amber"
-            size="md"
-            icon={<ArrowLeft className="w-4 h-4 text-navy-950" />}
-            className="self-start md:self-auto flex-shrink-0"
-          >
-            مشاهده جزئیات سامانه
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center gap-3 self-start md:self-auto flex-shrink-0">
+            <Link
+              to="/platform"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-brand-sand border border-[#0F1821] text-navy-950 hover:bg-white font-bold text-xs transition-colors font-vazir"
+            >
+              <span>معرفی کامل سامانه</span>
+              <ArrowLeft className="w-3.5 h-3.5" />
+            </Link>
+
+            <a
+              href="https://madan.ba3tani.ir"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-[#EFA73F] hover:bg-[#D48E28] text-[#0F1821] font-bold text-xs transition-colors font-vazir shadow-xs"
+            >
+              <span>ورود به سامانه (madan.ba3tani.ir)</span>
+              <ArrowLeft className="w-3.5 h-3.5" />
+            </a>
+          </div>
         </motion.div>
 
         {/* 4 Connected Nodes / Workflow with Scroll-Driven Beam */}

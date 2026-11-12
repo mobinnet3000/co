@@ -23,15 +23,14 @@ export const ProjectsPage: React.FC = () => {
       />
 
       {/* Header Banner */}
-      <section className="pt-32 pb-16 bg-navy-900 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+      <section className="pt-32 pb-16 bg-navy-950 text-white relative overflow-hidden border-b border-[#E3DAD0]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <Breadcrumb items={[{ label: 'پروژه‌ها و مطالعات موردی' }]} />
           <div className="max-w-3xl">
-            <span className="text-xs font-mono text-brand-cyan tracking-wider uppercase block mb-3">
-              CASE STUDIES & PORTFOLIO
+            <span className="text-xs font-mono text-[#EFA73F] tracking-wider uppercase block mb-3 font-semibold">
+              CASE STUDIES & PORTFOLIO // معدنکو
             </span>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black font-vazir leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black font-vazir leading-tight mb-6 text-white">
               پروژه‌ها و مطالعات موردی
             </h1>
             <p className="text-slate-300 text-base sm:text-lg font-light leading-relaxed">
@@ -42,7 +41,7 @@ export const ProjectsPage: React.FC = () => {
       </section>
 
       {/* Main Content: Verified Projects or Professional Empty State */}
-      <section className="py-20 bg-brand-bgLight">
+      <section className="py-20 bg-brand-sand">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {hasVerifiedProjects ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -51,20 +50,20 @@ export const ProjectsPage: React.FC = () => {
                 .map((project) => (
                   <div
                     key={project.id}
-                    className="bg-white rounded-card overflow-hidden border border-brand-border shadow-subtle hover:shadow-card transition-all flex flex-col justify-between"
+                    className="bg-white/90 rounded-2xl overflow-hidden border border-[#E3DAD0] shadow-card hover:shadow-elevated transition-all flex flex-col justify-between"
                   >
                     <div className="p-6">
-                      <span className="text-xs font-mono text-brand-blue mb-2 block">{project.industry}</span>
-                      <h3 className="text-lg font-bold text-navy-900 mb-2 font-vazir">{project.title}</h3>
+                      <span className="text-xs font-mono text-slate-500 mb-2 block">{project.industry}</span>
+                      <h3 className="text-lg font-bold text-navy-950 mb-2 font-vazir">{project.title}</h3>
                       <p className="text-xs text-slate-600 line-clamp-3 mb-4">{project.scope}</p>
                     </div>
                     <div className="p-6 pt-0">
                       <Link
                         to={`/projects/${project.slug}`}
-                        className="text-xs font-bold text-brand-blue inline-flex items-center gap-1"
+                        className="text-xs font-bold text-[#0F1821] hover:text-[#C92127] inline-flex items-center gap-1"
                       >
                         <span>مطالعه گزارش پروژه</span>
-                        <ArrowUpLeft className="w-3.5 h-3.5" />
+                        <ArrowUpLeft className="w-3.5 h-3.5 text-[#C92127]" />
                       </Link>
                     </div>
                   </div>
@@ -72,16 +71,16 @@ export const ProjectsPage: React.FC = () => {
             </div>
           ) : (
             /* Professional Empty State as explicitly instructed by prompt */
-            <div className="max-w-3xl mx-auto bg-white rounded-3xl p-8 sm:p-14 border border-brand-border shadow-card text-center">
-              <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200 text-brand-blue mx-auto flex items-center justify-center mb-6">
-                <FolderGit2 className="w-8 h-8" />
+            <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-sm rounded-3xl p-8 sm:p-14 border border-[#E3DAD0] shadow-card text-center">
+              <div className="w-16 h-16 rounded-2xl bg-[#FAF7F3] border border-[#E3DAD0] text-[#0F1821] mx-auto flex items-center justify-center mb-6">
+                <FolderGit2 className="w-8 h-8 text-[#EFA73F]" />
               </div>
 
-              <span className="text-xs font-mono text-brand-copper tracking-wider uppercase block mb-3 font-semibold">
+              <span className="text-xs font-mono text-[#C92127] tracking-wider uppercase block mb-3 font-semibold">
                 CONFIDENTIALITY & VERIFICATION POLICY
               </span>
 
-              <h2 className="text-xl sm:text-2xl font-bold text-navy-900 font-vazir mb-4 leading-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-navy-950 font-vazir mb-4 leading-tight">
                 {projectEmptyStateNotice.title}
               </h2>
 
@@ -89,8 +88,8 @@ export const ProjectsPage: React.FC = () => {
                 {projectEmptyStateNotice.description}
               </p>
 
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-500 mb-8 max-w-lg mx-auto flex items-center gap-2 text-right">
-                <ShieldCheck className="w-4 h-4 text-brand-success flex-shrink-0" />
+              <div className="p-4 rounded-xl bg-brand-sandLight border border-[#E3DAD0] text-xs text-slate-600 mb-8 max-w-lg mx-auto flex items-center gap-2 text-right">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                 <span>
                   کلیه مطالعات موردی پس از امضای توافق‌نامه افشای متقابل (NDA) و مجوز مکتوب کارفرما منتشر می‌گردند.
                 </span>
@@ -101,6 +100,7 @@ export const ProjectsPage: React.FC = () => {
                 variant="primary"
                 size="md"
                 icon={<ArrowLeft className="w-4 h-4" />}
+                className="bg-[#EFA73F] text-navy-950 hover:bg-[#D48E28] font-bold border-none"
               >
                 {projectEmptyStateNotice.ctaText}
               </Button>

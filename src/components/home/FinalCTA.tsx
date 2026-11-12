@@ -61,17 +61,17 @@ export const FinalCTA: React.FC = () => {
                 to="/contact"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#EFA73F] hover:bg-[#D48E28] text-[#0F1821] font-bold rounded-[10px] shadow-glow-amber transition-all duration-200 select-none text-sm sm:text-base group"
               >
-                <span>درخواست مشاوره تخصصی</span>
+                <span>ارتباط مستقیم با کارشناسان</span>
                 <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
               </Link>
 
-              {/* Red Outline Action Button */}
-              <Link
-                to="/platform"
+              {/* Red Outline Action Button - Direct Call */}
+              <a
+                href="tel:09999196630"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-[#C92127] text-[#C92127] hover:bg-[#C92127]/10 rounded-[10px] bg-transparent transition-all duration-200 font-bold select-none text-sm sm:text-base"
               >
-                <span>سامانه تحلیل داده</span>
-              </Link>
+                <span>تماس تلفنی: ۰۹۹۹ ۹۱۹ ۶۶۳۰</span>
+              </a>
             </div>
           </div>
         </motion.div>

@@ -76,23 +76,25 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
               </ul>
             </nav>
 
-            {/* Footer Actions (سامانه تحلیل داده + درخواست مشاوره) */}
+            {/* Footer Actions (ورود به سامانه + ارتباط با ما) */}
             <div className="p-5 border-t border-brand-border bg-white/60 space-y-2.5">
-              <Link
-                to="/platform"
+              <a
+                href="https://madan.ba3tani.ir"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={onClose}
                 style={{ backgroundColor: '#efa73f', color: '#0f1821' }}
                 className="w-full py-2.5 px-4 rounded-[10px] font-bold text-sm text-center shadow-sm flex items-center justify-center hover:brightness-95 transition-all select-none border border-[#d48e28]/30"
               >
-                سامانه تحلیل داده
-              </Link>
+                ورود به سامانه (madan.ba3tani.ir)
+              </a>
               <Link
                 to="/contact"
                 onClick={onClose}
                 style={{ backgroundColor: 'transparent', borderColor: '#c92127', color: '#c92127' }}
                 className="w-full py-2.5 px-4 rounded-[10px] font-semibold text-sm text-center border shadow-xs flex items-center justify-center gap-2 hover:bg-[#c92127]/10 transition-all select-none"
               >
-                <span>درخواست مشاوره</span>
+                <span>ارتباط با ما</span>
                 <ArrowLeft className="w-4 h-4" />
               </Link>
               <div className="text-center text-[11px] text-slate-500 font-light pt-1">

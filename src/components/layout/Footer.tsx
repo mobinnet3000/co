@@ -1,182 +1,149 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, MapPin, Clock, ArrowUpLeft, ShieldCheck, Database, Layers, Activity } from 'lucide-react';
+import { Mail, MapPin, Phone, ArrowUpLeft, ExternalLink } from 'lucide-react';
 import { companyData } from '../../data/company';
-import { servicesData } from '../../data/services';
-import { industriesData } from '../../data/industries';
 import { Logo } from '../common/Logo';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-brand-sand text-[#0F1821] pt-14 pb-10 border-t border-[#E3DAD0] relative overflow-hidden select-none">
-      {/* Background Architectural Guidelines */}
-      <div className="absolute inset-0 pointer-events-none opacity-40">
-        <div className="absolute top-0 bottom-0 right-[12%] w-[1px] bg-[#E3DAD0]/70"></div>
-        <div className="absolute top-0 bottom-0 left-[12%] w-[1px] bg-[#E3DAD0]/70"></div>
+    <footer className="bg-brand-sand text-[#0F1821] pt-12 pb-8 border-t border-[#E3DAD0] relative overflow-hidden select-none">
+      {/* Background Architectural Guidelines - Ultra Minimal */}
+      <div className="absolute inset-0 pointer-events-none opacity-30">
+        <div className="absolute top-0 bottom-0 right-[12%] w-[1px] bg-[#E3DAD0]"></div>
+        <div className="absolute top-0 bottom-0 left-[12%] w-[1px] bg-[#E3DAD0]"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Main Footer Directory Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-10">
-          {/* Col 1: Brand Info & Contact (4 cols) */}
-          <div className="lg:col-span-4 space-y-4 text-right">
-            <div className="mb-2">
+        
+        {/* Top Section: Brand Identity & Direct Contact */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-10 border-b border-[#E3DAD0]">
+          {/* Brand Info */}
+          <div className="space-y-3 max-w-xl text-right">
+            <div className="inline-block">
               <Logo asVideo size="md" />
             </div>
 
-            <div>
-              <span className="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                CORPORATE IDENTITY // هویت رسمی
-              </span>
-              <h3 className="text-sm font-bold text-[#0F1821] font-vazir leading-snug">
+            <div className="flex items-center gap-2 pt-1 text-xs font-vazir">
+              <span className="w-2 h-2 rounded-full bg-[#C92127]"></span>
+              <span className="font-bold text-navy-950">
                 شرکت محاسبات عملیات داده ارزیابی نوین با مسئولیت محدود
-              </h3>
-            </div>
-
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-light">
-              پلتفرم و راهکارهای تخصصی پایش، تحلیل و بهینه‌سازی خطوط فرآوری مواد معدنی از طریق موازنه متالورژیکی و یکپارچه‌سازی داده‌های عملیاتی کارخانجات.
-            </p>
-
-            {/* Slogan with Red/Amber Pulse Dot */}
-            <div className="pt-2 flex items-center gap-2.5 text-xs">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C92127] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#EFA73F]"></span>
               </span>
-              <span className="text-[#0F1821] font-bold">«فناوری داده در خدمت معدن»</span>
+              <span className="text-slate-400 font-mono">|</span>
+              <span className="text-slate-500 font-light">«فناوری داده در خدمت معدن»</span>
             </div>
 
-            <div className="pt-4 border-t border-[#E3DAD0] text-xs text-slate-600 space-y-2.5">
-              <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-[#EFA73F] flex-shrink-0 mt-0.5" />
-                <span>{companyData.details.address}</span>
-              </div>
-              {companyData.details.email && (
-                <div className="flex items-center gap-2.5">
-                  <Mail className="w-4 h-4 text-[#C92127] flex-shrink-0" />
-                  <a
-                    href={`mailto:${companyData.details.email}`}
-                    className="hover:text-[#0F1821] transition-colors font-mono font-semibold"
-                  >
-                    {companyData.details.email}
-                  </a>
-                </div>
-              )}
-              {companyData.details.workingHours && (
-                <div className="flex items-center gap-2.5">
-                  <Clock className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                  <span>{companyData.details.workingHours}</span>
-                </div>
-              )}
-            </div>
+            <p className="text-xs text-slate-600 leading-relaxed font-light">
+              پلتفرم و راهکارهای تخصصی پایش، تحلیل و بهینه‌سازی خطوط فرآوری مواد معدنی از طریق موازنه متالورژیکی و یکپارچه‌سازی داده‌های عملیاتی.
+            </p>
           </div>
 
-          {/* Col 2: Services (3 cols) */}
-          <div className="lg:col-span-3 space-y-3 text-right">
-            <h3 className="text-[#0F1821] font-bold text-sm tracking-wide border-b border-[#E3DAD0] pb-2.5 flex items-center gap-2 font-vazir">
-              <Database className="w-4 h-4 text-[#EFA73F]" />
-              <span>راهکارها و خدمات تخصصی</span>
-            </h3>
-            <ul className="space-y-2 text-xs">
-              {servicesData.map((service) => (
-                <li key={service.id}>
-                  <Link
-                    to={`/services/${service.slug}`}
-                    className="text-slate-600 hover:text-[#0F1821] transition-colors flex items-center justify-between py-1 group"
-                  >
-                    <span className="group-hover:translate-x-[-2px] transition-transform">{service.title}</span>
-                    <ArrowUpLeft className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-[#EFA73F]" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Quick Direct Contacts (Clean Badges) */}
+          <div className="flex flex-wrap lg:flex-col items-start lg:items-end gap-3 text-xs">
+            {/* Phone */}
+            <a
+              href="tel:09999196630"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-[10px] bg-white/80 border border-[#E3DAD0] text-navy-950 hover:border-[#C92127] hover:text-[#C92127] transition-all shadow-xs group"
+            >
+              <Phone className="w-3.5 h-3.5 text-[#C92127]" />
+              <span className="font-vazir font-medium text-slate-600">تماس مستقیم:</span>
+              <span dir="ltr" className="font-mono font-bold text-navy-950 group-hover:text-[#C92127]">
+                09999196630
+              </span>
+            </a>
 
-          {/* Col 3: Industries & Platform (2 cols) */}
-          <div className="lg:col-span-2 space-y-3 text-right">
-            <h3 className="text-[#0F1821] font-bold text-sm tracking-wide border-b border-[#E3DAD0] pb-2.5 flex items-center gap-2 font-vazir">
-              <Layers className="w-4 h-4 text-[#C92127]" />
-              <span>صنایع هدف</span>
-            </h3>
-            <ul className="space-y-2 text-xs">
-              {industriesData.map((ind) => (
-                <li key={ind.id}>
-                  <Link
-                    to={`/industries/${ind.slug}`}
-                    className="text-slate-600 hover:text-[#0F1821] transition-colors block py-1 hover:translate-x-[-2px]"
-                  >
-                    {ind.title}
-                  </Link>
-                </li>
-              ))}
-              <li className="pt-2">
-                <Link
-                  to="/platform"
-                  className="inline-flex items-center gap-1.5 text-[#0F1821] hover:text-[#C92127] font-bold transition-colors text-xs"
-                >
-                  <Activity className="w-3.5 h-3.5 text-[#EFA73F]" />
-                  <span>سامانه تحلیل داده</span>
-                  <ArrowUpLeft className="w-3.5 h-3.5" />
-                </Link>
-              </li>
-            </ul>
-          </div>
+            {/* Email */}
+            <a
+              href={`mailto:${companyData.details.email}`}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-[10px] bg-white/80 border border-[#E3DAD0] text-navy-950 hover:border-[#EFA73F] transition-all shadow-xs"
+            >
+              <Mail className="w-3.5 h-3.5 text-[#EFA73F]" />
+              <span className="font-mono font-medium">{companyData.details.email}</span>
+            </a>
 
-          {/* Col 4: Corporate Documents & Assurance (3 cols) */}
-          <div className="lg:col-span-3 space-y-3 text-right">
-            <h3 className="text-[#0F1821] font-bold text-sm tracking-wide border-b border-[#E3DAD0] pb-2.5 flex items-center gap-2 font-vazir">
-              <ShieldCheck className="w-4 h-4 text-[#2B8367]" />
-              <span>اصالت سازمانی و مدارک</span>
-            </h3>
-            <ul className="space-y-2 text-xs">
-              <li>
-                <Link to="/about" className="text-slate-600 hover:text-[#0F1821] transition-colors block py-1 hover:translate-x-[-2px]">
-                  درباره معدنکو و ماموریت مهندسی
-                </Link>
-              </li>
-              <li>
-                <Link to="/company" className="text-slate-600 hover:text-[#0F1821] transition-colors block py-1 hover:translate-x-[-2px]">
-                  شناسنامه رسمی شرکت (نسخه چاپی)
-                </Link>
-              </li>
-              <li>
-                <Link to="/projects" className="text-slate-600 hover:text-[#0F1821] transition-colors block py-1 hover:translate-x-[-2px]">
-                  پروژه‌ها و مطالعات موردی
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="text-slate-600 hover:text-[#0F1821] transition-colors block py-1 hover:translate-x-[-2px]">
-                  دانشنامه و یادداشت‌های تخصصی
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-slate-600 hover:text-[#0F1821] transition-colors block py-1 hover:translate-x-[-2px]">
-                  ارتباط با کارشناسان و استعلام
-                </Link>
-              </li>
-            </ul>
-
-            <div className="pt-3">
-              <div className="p-3.5 bg-white/80 rounded-[10px] border border-[#E3DAD0] shadow-xs text-[11px] text-slate-600 leading-relaxed font-light">
-                <span className="text-[#0F1821] font-bold">پایش و بهینه‌سازی:</span> تمامی ارقام و مدل‌ها منطبق بر موازنه دقیق متالورژیکی و اصول کانی‌آرایی خطوط تولید طراحی شده‌اند.
-              </div>
+            {/* Address */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-[10px] bg-white/80 border border-[#E3DAD0] text-slate-700 text-xs shadow-xs">
+              <MapPin className="w-3.5 h-3.5 text-slate-500" />
+              <span>{companyData.details.address}</span>
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright & Metadata */}
-        <div className="pt-6 border-t border-[#E3DAD0] flex flex-col sm:flex-row items-center justify-between text-xs text-slate-600 gap-4">
-          <p className="text-center sm:text-right leading-relaxed">
+        {/* Middle Section: Essential Minimal Navigation Links */}
+        <div className="py-6 flex flex-wrap items-center justify-between gap-4 text-xs font-vazir">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-slate-700">
+            <Link
+              to="/"
+              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
+            >
+              صفحه اصلی
+            </Link>
+
+            <Link
+              to="/platform"
+              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
+            >
+              معرفی سامانه پایش
+            </Link>
+
+            <Link
+              to="/services"
+              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
+            >
+              خدمات مهندسی
+            </Link>
+
+            <Link
+              to="/about"
+              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
+            >
+              درباره ما
+            </Link>
+
+            <Link
+              to="/company"
+              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
+            >
+              شناسنامه رسمی شرکت
+            </Link>
+
+            <Link
+              to="/contact"
+              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
+            >
+              ارتباط با ما
+            </Link>
+          </div>
+
+          {/* Direct Live Platform Access Button */}
+          <a
+            href="https://madan.ba3tani.ir"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[10px] bg-[#EFA73F] text-[#0F1821] hover:bg-[#D48E28] font-bold text-xs transition-colors shadow-xs"
+          >
+            <span>ورود به سامانه زنده (madan.ba3tani.ir)</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+
+        {/* Bottom Bar: Copyright & Domain */}
+        <div className="pt-6 border-t border-[#E3DAD0] flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
+          <p className="text-center sm:text-right leading-relaxed font-light">
             تمامی حقوق مادی و معنوی متعلق به{' '}
-            <strong className="text-[#0F1821] font-bold">شرکت محاسبات عملیات داده ارزیابی نوین با مسئولیت محدود</strong> با نام تجاری{' '}
-            <strong className="text-[#0F1821] font-bold">معدنکو (Madan Co)</strong> می‌باشد.
+            <strong className="text-navy-950 font-bold">شرکت محاسبات عملیات داده ارزیابی نوین</strong> (نام تجاری{' '}
+            <strong className="text-navy-950 font-bold">معدنکو Madan Co</strong>) می‌باشد.
           </p>
-          <div className="flex items-center gap-4 flex-shrink-0">
-            <span className="font-mono text-[11px] text-slate-500 bg-white/70 px-2.5 py-1 rounded-[6px] border border-[#E3DAD0]">
-              © {new Date().getFullYear()} MADAN CO. ALL RIGHTS RESERVED.
+
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-[11px] font-bold text-slate-600 bg-white/70 px-2.5 py-1 rounded-[6px] border border-[#E3DAD0]">
+              madan.co.ir
+            </span>
+            <span className="font-mono text-[11px] text-slate-400">
+              © {new Date().getFullYear()}
             </span>
           </div>
         </div>
+
       </div>
     </footer>
   );

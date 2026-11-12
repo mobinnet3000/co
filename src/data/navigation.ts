@@ -9,6 +9,10 @@ export const headerNavItems: NavItem[] = [
     path: '/',
   },
   {
+    label: 'معرفی سامانه',
+    path: '/platform',
+  },
+  {
     label: 'خدمات',
     path: '/services',
   },

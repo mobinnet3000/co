@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, MonitorCheck } from 'lucide-react';
 import { Button } from '../common/Button';
 import { AnimatedSection } from '../common/AnimatedSection';
@@ -24,23 +25,21 @@ export const PlatformCTA: React.FC = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button
+                <a
+                  href="https://madan.ba3tani.ir"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-[10px] bg-[#EFA73F] text-[#0F1821] hover:bg-[#D48E28] font-bold text-sm transition-colors font-vazir"
+                >
+                  <span>ورود مستقیم به سامانه پایش (madan.ba3tani.ir)</span>
+                  <ArrowLeft className="w-4 h-4" />
+                </a>
+                <Link
                   to="/contact"
-                  variant="copper"
-                  size="lg"
-                  icon={<ArrowLeft className="w-4 h-4" />}
-                  className="w-full sm:w-auto font-semibold"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-[10px] border border-[#C92127] text-[#C92127] hover:bg-[#C92127]/10 font-bold text-sm transition-colors font-vazir"
                 >
-                  درخواست جلسه دمو و بررسی فلوشیت
-                </Button>
-                <Button
-                  to="/services"
-                  variant="outline"
-                  size="lg"
-                  className="w-full sm:w-auto bg-white/5 border-slate-700 text-white hover:bg-white/10"
-                >
-                  بررسی سایر خدمات شرکت
-                </Button>
+                  ارتباط مستقیم با کارشناسان
+                </Link>
               </div>
             </div>
           </div>

@@ -6,7 +6,6 @@ import { Hero } from '../components/home/Hero';
 import { CompanyIntro } from '../components/home/CompanyIntro';
 import { PlatformOverview } from '../components/home/PlatformOverview';
 import { ServicesOverview } from '../components/home/ServicesOverview';
-import { IndustriesOverview } from '../components/home/IndustriesOverview';
 import { Advantages } from '../components/home/Advantages';
 import { FinalCTA } from '../components/home/FinalCTA';
 import { companyData } from '../data/company';
@@ -19,13 +18,15 @@ export const HomePage: React.FC = () => {
     '@type': 'Organization',
     name: companyData.officialNameFa,
     alternateName: companyData.brandName,
-    url: 'https://novin-amaliat.ir',
-    logo: 'https://novin-amaliat.ir/favicon.svg',
+    url: 'https://madan.co.ir',
+    logo: 'https://madan.co.ir/favicon.svg',
     description: companyData.descriptionFa,
     email: companyData.details.email,
+    telephone: companyData.details.phone,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Tehran',
+      addressLocality: 'تهران',
+      streetAddress: 'نیروی دریایی',
       addressCountry: 'IR',
     },
   };
@@ -43,7 +44,6 @@ export const HomePage: React.FC = () => {
       <CompanyIntro />
       <PlatformOverview />
       <ServicesOverview />
-      <IndustriesOverview />
       <Advantages />
       <FinalCTA />
     </PageContainer>

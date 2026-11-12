@@ -1,5 +1,12 @@
 import { PlatformWorkflowStep } from '../types';
 
+export const platformMeta = {
+  name: 'سامانه پایش و تحلیل داده‌های خطوط فرآوری معدنکو',
+  liveUrl: 'https://madan.ba3tani.ir',
+  liveHostname: 'madan.ba3tani.ir',
+  presentationPath: '/platform',
+};
+
 export const platformFeatures = [
   {
     id: 'f1',

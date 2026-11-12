@@ -1,5 +1,5 @@
-# robots.txt for mohasebat-novin
+# robots.txt for Madan Co (معدنکو)
 User-agent: *
 Allow: /
 
-Sitemap: https://novin-amaliat.ir/sitemap.xml
+Sitemap: https://madan.co.ir/sitemap.xml

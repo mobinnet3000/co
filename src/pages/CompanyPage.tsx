@@ -26,15 +26,15 @@ export const CompanyPage: React.FC = () => {
       />
 
       {/* Header Banner - hidden on print */}
-      <section className="pt-32 pb-12 bg-navy-900 text-white relative no-print">
+      <section className="pt-32 pb-12 bg-navy-950 text-white relative no-print border-b border-[#E3DAD0]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <Breadcrumb items={[{ label: 'درباره شرکت', path: '/about' }, { label: 'شناسنامه رسمی شرکت' }]} />
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <span className="text-xs font-mono text-brand-cyan tracking-wider uppercase block mb-2">
+              <span className="text-xs font-mono text-[#EFA73F] tracking-wider uppercase block mb-2">
                 OFFICIAL COMPANY PROFILE
               </span>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-vazir">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black font-vazir text-white">
                 شناسنامه رسمی و پروفایل شرکتی
               </h1>
               <p className="text-slate-300 text-xs sm:text-sm mt-2 max-w-xl font-light">
@@ -45,10 +45,10 @@ export const CompanyPage: React.FC = () => {
             <div className="flex items-center gap-3">
               <Button
                 onClick={handlePrint}
-                variant="copper"
+                variant="primary"
                 size="md"
                 icon={<Printer className="w-4 h-4" />}
-                className="shadow-sm"
+                className="shadow-sm bg-[#EFA73F] hover:bg-[#D48E28] text-navy-950 font-bold border-none"
               >
                 چاپ معرفی شرکت
               </Button>
@@ -58,9 +58,9 @@ export const CompanyPage: React.FC = () => {
       </section>
 
       {/* Formal Document Layout - Suitable for Print & Web */}
-      <section className="py-12 bg-brand-bgLight">
+      <section className="py-12 bg-brand-sand">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-card border border-brand-border p-8 sm:p-14 print:p-0 print:border-none print:shadow-none print:rounded-none">
+          <div className="bg-white rounded-2xl shadow-card border border-[#E3DAD0] p-8 sm:p-14 print:p-0 print:border-none print:shadow-none print:rounded-none">
             {/* Document Header */}
             <div className="border-b-2 border-navy-900 pb-8 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div>
@@ -219,6 +219,7 @@ export const CompanyPage: React.FC = () => {
             <div className="pt-6 border-t-2 border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-slate-600 gap-4">
               <div>
                 <div><strong>واحد امور متقاضیان و کارفرمایان:</strong> {companyData.details.email}</div>
+                <div><strong>تلفن مستقیم:</strong> <span dir="ltr" className="font-mono font-bold text-navy-950">09999196630</span></div>
                 <div><strong>نشانی:</strong> {companyData.details.address}</div>
               </div>
               <div className="text-left font-mono text-[11px] text-slate-400">

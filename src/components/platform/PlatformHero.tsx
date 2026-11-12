@@ -39,20 +39,20 @@ export const PlatformHero: React.FC = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Button
-              to="/contact"
-              variant="copper"
-              size="lg"
-              icon={<ArrowLeft className="w-4 h-4" />}
-              className="w-full sm:w-auto font-semibold shadow-glow-copper"
+            <a
+              href="https://madan.ba3tani.ir"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 text-sm sm:text-base px-6 py-3.5 rounded-[10px] bg-[#EFA73F] text-[#0F1821] hover:bg-[#D48E28] transition-colors w-full sm:w-auto font-bold shadow-sm"
             >
-              درخواست معرفی سامانه
-            </Button>
+              <span>ورود به سامانه زنده (madan.ba3tani.ir)</span>
+              <ArrowLeft className="w-4 h-4" />
+            </a>
             <a
               href="#dashboard-demo"
               className="inline-flex items-center justify-center text-sm sm:text-base px-6 py-3.5 rounded-[10px] bg-navy-800 border border-slate-700 text-slate-200 hover:text-white hover:bg-navy-700 transition-colors w-full sm:w-auto font-medium"
             >
-              مشاهده دموی تعاملی داشبورد
+              مشاهده دموی تعاملی و مشخصات
             </a>
           </div>
 
