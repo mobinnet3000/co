@@ -1,5 +1,27 @@
 import { NavItem } from '../types';
 
+/**
+ * تب‌های مهم و ضروری هدر (مینیمال و غیرشلوغ متناسب با این مرحله)
+ */
+export const headerNavItems: NavItem[] = [
+  {
+    label: 'صفحه اصلی',
+    path: '/',
+  },
+  {
+    label: 'خدمات',
+    path: '/services',
+  },
+  {
+    label: 'درباره ما',
+    path: '/about',
+  },
+  {
+    label: 'تماس با ما',
+    path: '/contact',
+  },
+];
+
 export const navigationItems: NavItem[] = [
   {
     label: 'صفحه اصلی',

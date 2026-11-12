@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown, ArrowLeft } from 'lucide-react';
-import { navigationItems } from '../../data/navigation';
+import { Menu, ArrowLeft } from 'lucide-react';
+import { headerNavItems } from '../../data/navigation';
 import { Logo } from '../common/Logo';
-import { Button } from '../common/Button';
 import { MobileMenu } from './MobileMenu';
 import { useScrollPosition } from '../../hooks/useScrollPosition';
 
@@ -11,15 +10,13 @@ interface NavbarProps {
   forceDarkText?: boolean;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ forceDarkText = false }) => {
+export const Navbar: React.FC<NavbarProps> = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const scrollY = useScrollPosition();
   const location = useLocation();
 
   useEffect(() => {
     setMobileMenuOpen(false);
-    setActiveDropdown(null);
   }, [location.pathname]);
 
   const isScrolled = scrollY > 20;
@@ -29,103 +26,72 @@ export const Navbar: React.FC<NavbarProps> = ({ forceDarkText = false }) => {
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           isScrolled
-            ? 'bg-brand-sand/95 backdrop-blur-md shadow-subtle border-b border-brand-border py-3'
-            : 'bg-brand-sand/80 backdrop-blur-sm border-b border-brand-border/60 py-4 sm:py-5'
+            ? 'bg-brand-sand/95 backdrop-blur-md shadow-subtle border-b border-brand-border py-2.5 sm:py-3'
+            : 'bg-brand-sand/85 backdrop-blur-sm border-b border-brand-border/60 py-3 sm:py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Right: Company Logo */}
-            <div className="flex-shrink-0">
-              <Logo variant="dark" size="md" />
+          <div className="flex items-center justify-between gap-4">
+            {/* Right: Company Animated Logo Motion */}
+            <div className="flex-shrink-0 flex items-center">
+              <Logo asVideo size="md" />
             </div>
 
-            {/* Center: Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-              {navigationItems.map((item) => {
-                const isActive =
-                  location.pathname === item.path ||
-                  (item.children && item.children.some((c) => location.pathname === c.path));
-                const hasChildren = item.children && item.children.length > 0;
+            {/* Center: Essential Minimal Navigation Tabs */}
+            <nav className="hidden lg:flex items-center gap-2 xl:gap-2.5">
+              {headerNavItems.map((item) => {
+                const isActive = location.pathname === item.path;
 
                 return (
-                  <div
+                  <Link
                     key={item.path}
-                    className="relative"
-                    onMouseEnter={() => hasChildren && setActiveDropdown(item.label)}
-                    onMouseLeave={() => hasChildren && setActiveDropdown(null)}
+                    to={item.path}
+                    style={
+                      isActive
+                        ? { backgroundColor: 'transparent', borderColor: '#0f1821', color: '#0f1821' }
+                        : { backgroundColor: 'rgba(15, 24, 33, 0.08)', borderColor: 'transparent', color: '#0f1821' }
+                    }
+                    className={`px-3.5 py-2 text-xs sm:text-sm rounded-[10px] border transition-all duration-200 select-none ${
+                      isActive
+                        ? 'font-bold shadow-xs'
+                        : 'font-medium hover:bg-[#0f1821]/[0.13]'
+                    }`}
                   >
-                    {hasChildren ? (
-                      <button
-                        type="button"
-                        className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150 ${
-                          isActive
-                            ? 'text-navy-950 font-bold bg-white/80 shadow-xs'
-                            : 'text-slate-700 hover:text-navy-950 hover:bg-white/50'
-                        }`}
-                      >
-                        <span>{item.label}</span>
-                        <ChevronDown className="w-3.5 h-3.5 opacity-60" />
-                      </button>
-                    ) : (
-                      <Link
-                        to={item.path}
-                        className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150 inline-block ${
-                          isActive
-                            ? 'text-navy-950 font-bold bg-white/80 shadow-xs'
-                            : 'text-slate-700 hover:text-navy-950 hover:bg-white/50'
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    )}
-
-                    {/* Minimalist Dropdown Menu */}
-                    {hasChildren && activeDropdown === item.label && (
-                      <div className="absolute top-full right-0 mt-1.5 w-72 bg-white rounded-xl shadow-elevated border border-brand-border py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                        {item.children?.map((child) => (
-                          <Link
-                            key={child.path}
-                            to={child.path}
-                            className="block px-4 py-2.5 text-right hover:bg-brand-sand transition-colors group"
-                          >
-                            <div className="text-sm font-medium text-navy-900 group-hover:text-brand-amberDark transition-colors">
-                              {child.label}
-                            </div>
-                            {child.description && (
-                              <div className="text-xs text-slate-500 mt-0.5 leading-snug line-clamp-1 font-light">
-                                {child.description}
-                              </div>
-                            )}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                    <span>{item.label}</span>
+                  </Link>
                 );
               })}
             </nav>
 
-            {/* Left: Primary CTA Button & Mobile Trigger */}
-            <div className="flex items-center gap-3">
-              <Button
-                to="/contact"
-                variant="copper"
-                size="sm"
-                className="hidden sm:inline-flex bg-navy-900 hover:bg-navy-800 text-white font-medium border-none shadow-sm"
-                icon={<ArrowLeft className="w-3.5 h-3.5" />}
+            {/* Left: Action Boxes (سامانه تحلیل داده + درخواست مشاوره) & Mobile Trigger */}
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              {/* سامانه تحلیل داده - Official Corporate Yellow (#efa73f) with Navy Text (#0f1821) */}
+              <Link
+                to="/platform"
+                style={{ backgroundColor: '#efa73f', color: '#0f1821' }}
+                className="hidden sm:inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-[10px] text-xs sm:text-sm font-bold shadow-sm hover:brightness-95 active:scale-95 transition-all select-none border border-[#d48e28]/30"
               >
-                درخواست مشاوره
-              </Button>
+                <span>سامانه تحلیل داده</span>
+              </Link>
 
-              {/* Hamburger Button */}
+              {/* درخواست مشاوره - Transparent bg with thin red stroke (#c92127) & red text */}
+              <Link
+                to="/contact"
+                style={{ backgroundColor: 'transparent', borderColor: '#c92127', color: '#c92127' }}
+                className="hidden sm:inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-[10px] text-xs sm:text-sm font-semibold border shadow-xs hover:bg-[#c92127]/10 active:scale-95 transition-all select-none"
+              >
+                <span>درخواست مشاوره</span>
+                <ArrowLeft className="w-3.5 h-3.5" />
+              </Link>
+
+              {/* Hamburger Button for Mobile */}
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="lg:hidden p-2 rounded-lg text-navy-900 hover:bg-white/60 transition-colors"
+                className="lg:hidden p-2 rounded-lg text-[#0f1821] hover:bg-white/60 transition-colors"
                 aria-label="منوی سایت"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-5 h-5" />
               </button>
             </div>
           </div>

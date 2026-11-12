@@ -6,7 +6,7 @@ interface ButtonProps {
   to?: string;
   href?: string;
   onClick?: () => void;
-  variant?: 'primary' | 'secondary' | 'outline' | 'copper' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'outline' | 'copper' | 'ghost' | 'amber' | 'navy' | 'redOutline';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   icon?: React.ReactNode;
@@ -39,15 +39,21 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     primary:
-      'bg-brand-blue hover:bg-navy-800 text-white shadow-sm hover:shadow-md focus:ring-brand-blue border border-transparent',
+      'bg-navy-950 hover:bg-navy-900 text-white shadow-card hover:shadow-elevated focus:ring-navy-950 border border-transparent',
+    navy:
+      'bg-[#0F1821] hover:bg-[#14202B] text-white shadow-card hover:shadow-elevated focus:ring-navy-950 border border-transparent',
+    amber:
+      'bg-[#EFA73F] hover:bg-[#D48E28] text-[#0F1821] font-semibold shadow-card hover:shadow-elevated focus:ring-[#EFA73F] border border-transparent',
+    redOutline:
+      'border border-[#C92127] text-[#C92127] bg-transparent hover:bg-[#C92127]/10 focus:ring-[#C92127]',
     secondary:
       'bg-navy-900 hover:bg-navy-800 text-white shadow-sm hover:shadow-md focus:ring-navy-900 border border-transparent',
     outline:
-      'border border-slate-300 hover:border-brand-blue text-slate-700 hover:text-brand-blue bg-white hover:bg-slate-50 focus:ring-brand-blue',
+      'border border-[#E3DAD0] hover:border-navy-950 text-navy-950 bg-white/80 hover:bg-white focus:ring-navy-950 shadow-xs',
     copper:
-      'bg-brand-copper hover:bg-brand-copperDark text-white shadow-sm hover:shadow-glow-copper focus:ring-brand-copper border border-transparent',
+      'bg-[#EFA73F] hover:bg-[#D48E28] text-[#0F1821] shadow-card hover:shadow-elevated focus:ring-[#EFA73F] border border-transparent',
     ghost:
-      'text-slate-600 hover:text-navy-900 hover:bg-slate-100/70 focus:ring-slate-400',
+      'text-slate-600 hover:text-navy-950 hover:bg-[#0F1821]/5 focus:ring-slate-400',
   };
 
   const combinedStyles = `${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`;

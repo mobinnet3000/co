@@ -26,11 +26,11 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
       } ${className}`}
     >
       {eyebrow && (
-        <div className="inline-flex items-center gap-2 mb-3">
-          <span className="w-2 h-2 rounded-full bg-brand-cyan"></span>
+        <div className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-[10px] bg-white/60 border border-[#E3DAD0]">
+          <span className="w-2 h-2 rounded-full bg-[#EFA73F]"></span>
           <span
-            className={`text-xs md:text-sm font-semibold tracking-wider uppercase font-vazir ${
-              isDark ? 'text-brand-cyan' : 'text-brand-blue'
+            className={`text-xs md:text-sm font-semibold tracking-wider font-vazir ${
+              isDark ? 'text-[#EFA73F]' : 'text-[#0F1821]'
             }`}
           >
             {eyebrow}
@@ -40,7 +40,7 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
 
       <h2
         className={`text-2xl sm:text-3xl md:text-4xl font-extrabold font-vazir tracking-tight leading-snug md:leading-tight ${
-          isDark ? 'text-white' : 'text-navy-900'
+          isDark ? 'text-white' : 'text-[#0F1821]'
         }`}
       >
         {title}

@@ -32,8 +32,10 @@ export default {
         }
       },
       fontFamily: {
-        vazir: ['Vazirmatn', 'system-ui', 'sans-serif'],
-        inter: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Yekan Bakh"', 'IRANYekan', 'system-ui', 'sans-serif'],
+        vazir: ['"Yekan Bakh"', 'IRANYekan', 'system-ui', 'sans-serif'],
+        yekan: ['"Yekan Bakh"', 'system-ui', 'sans-serif'],
+        iranyekan: ['IRANYekan', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       boxShadow: {

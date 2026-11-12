@@ -7,10 +7,7 @@ import { CompanyIntro } from '../components/home/CompanyIntro';
 import { PlatformOverview } from '../components/home/PlatformOverview';
 import { ServicesOverview } from '../components/home/ServicesOverview';
 import { IndustriesOverview } from '../components/home/IndustriesOverview';
-import { ProcessSection } from '../components/home/ProcessSection';
 import { Advantages } from '../components/home/Advantages';
-import { TechnologySection } from '../components/home/TechnologySection';
-import { LatestArticles } from '../components/home/LatestArticles';
 import { FinalCTA } from '../components/home/FinalCTA';
 import { companyData } from '../data/company';
 
@@ -47,10 +44,7 @@ export const HomePage: React.FC = () => {
       <PlatformOverview />
       <ServicesOverview />
       <IndustriesOverview />
-      <ProcessSection />
       <Advantages />
-      <TechnologySection />
-      <LatestArticles />
       <FinalCTA />
     </PageContainer>
   );
