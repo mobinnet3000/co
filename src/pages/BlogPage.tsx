@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Clock, Calendar, ArrowUpLeft, BookOpen, Tag } from 'lucide-react';
 import { PageContainer } from '../components/layout/PageContainer';
@@ -6,13 +6,32 @@ import { SEO } from '../components/common/SEO';
 import { Breadcrumb } from '../components/layout/Breadcrumb';
 import { articlesData, articleCategories } from '../data/articles';
 import { pagesSEO } from '../data/seo';
+import { api } from '../services/api';
 
 export const BlogPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('همه مقالات');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [dynamicArticles, setDynamicArticles] = useState<any[] | null>(null);
   const seo = pagesSEO.blog;
 
-  const filteredArticles = articlesData.filter((article) => {
+  useEffect(() => {
+    api.articles.getPublic({
+      category: selectedCategory !== 'همه مقالات' ? selectedCategory : undefined,
+      search: searchQuery || undefined,
+    })
+      .then((res) => {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setDynamicArticles(res.data);
+        } else {
+          setDynamicArticles(null); // fallback to local confirmed data
+        }
+      })
+      .catch(() => {
+        setDynamicArticles(null);
+      });
+  }, [selectedCategory, searchQuery]);
+
+  const fallbackArticles = articlesData.filter((article) => {
     const matchesCategory =
       selectedCategory === 'همه مقالات' || article.category === selectedCategory;
     const matchesSearch =
@@ -21,6 +40,8 @@ export const BlogPage: React.FC = () => {
       article.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
+
+  const displayArticles = dynamicArticles || fallbackArticles;
 
   return (
     <PageContainer forceDarkNavbarText={true}>
@@ -94,66 +115,76 @@ export const BlogPage: React.FC = () => {
       {/* Articles Listing */}
       <section className="py-16 md:py-24 bg-brand-sand">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredArticles.length > 0 ? (
+          {displayArticles.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredArticles.map((article) => (
-                <article
-                  key={article.id}
-                  className="bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#E3DAD0] shadow-card hover:shadow-elevated hover:border-[#0F1821]/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full group"
-                >
-                  <div className="p-7">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-xs font-bold px-2.5 py-1 rounded-[8px] bg-brand-sand border border-[#E3DAD0] text-navy-950">
-                        {article.category}
-                      </span>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-[6px] bg-[#FAF7F3] text-slate-600 border border-[#E3DAD0]">
-                        یادداشت فنی
-                      </span>
-                    </div>
+              {displayArticles.map((article) => {
+                const categoryLabel = article.category_name || article.category || 'متالورژی و داده';
+                const readingTimeLabel = article.reading_time || article.readingTime || '۵ دقیقه';
+                const publishedAtLabel = article.published_at || article.publishedAt || '۱۴۰۳/۰۸';
+                const tagsList = Array.isArray(article.tags) ? article.tags : [];
 
-                    <Link to={`/blog/${article.slug}`}>
-                      <h2 className="text-lg font-bold text-navy-950 group-hover:text-[#C92127] transition-colors font-vazir leading-snug mb-3">
-                        {article.title}
-                      </h2>
-                    </Link>
-
-                    <p className="text-xs sm:text-sm text-slate-600 font-light leading-relaxed mb-6 line-clamp-3">
-                      {article.summary}
-                    </p>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-1.5 pt-2 border-t border-[#E3DAD0]/60">
-                      {article.tags.slice(0, 3).map((tag, tIdx) => (
-                        <span key={tIdx} className="text-[11px] text-slate-500 flex items-center gap-1 font-mono">
-                          <Tag className="w-2.5 h-2.5 text-[#EFA73F]" />
-                          <span>{tag}</span>
+                return (
+                  <article
+                    key={article.id}
+                    className="bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#E3DAD0] shadow-card hover:shadow-elevated hover:border-[#0F1821]/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full group"
+                  >
+                    <div className="p-7">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-xs font-bold px-2.5 py-1 rounded-[8px] bg-brand-sand border border-[#E3DAD0] text-navy-950">
+                          {categoryLabel}
                         </span>
-                      ))}
-                    </div>
-                  </div>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-[6px] bg-[#FAF7F3] text-slate-600 border border-[#E3DAD0]">
+                          یادداشت فنی
+                        </span>
+                      </div>
 
-                  <div className="px-7 py-4 bg-brand-sandLight border-t border-[#E3DAD0]/70 flex items-center justify-between text-xs text-slate-500">
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{article.readingTime}</span>
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{article.publishedAt}</span>
-                      </span>
+                      <Link to={`/blog/${article.slug}`}>
+                        <h2 className="text-lg font-bold text-navy-950 group-hover:text-[#C92127] transition-colors font-vazir leading-snug mb-3">
+                          {article.title}
+                        </h2>
+                      </Link>
+
+                      <p className="text-xs sm:text-sm text-slate-600 font-light leading-relaxed mb-6 line-clamp-3">
+                        {article.summary}
+                      </p>
+
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-1.5 pt-2 border-t border-[#E3DAD0]/60">
+                        {tagsList.slice(0, 3).map((tag: any, tIdx: number) => {
+                          const tagName = typeof tag === 'string' ? tag : tag.name;
+                          return (
+                            <span key={tIdx} className="text-[11px] text-slate-500 flex items-center gap-1 font-mono">
+                              <Tag className="w-2.5 h-2.5 text-[#EFA73F]" />
+                              <span>{tagName}</span>
+                            </span>
+                          );
+                        })}
+                      </div>
                     </div>
 
-                    <Link
-                      to={`/blog/${article.slug}`}
-                      className="font-bold text-[#0F1821] group-hover:text-[#C92127] inline-flex items-center gap-1 transition-colors"
-                    >
-                      <span>مطالعه مقاله</span>
-                      <ArrowUpLeft className="w-4 h-4 text-[#C92127]" />
-                    </Link>
-                  </div>
-                </article>
-              ))}
+                    <div className="px-7 py-4 bg-brand-sandLight border-t border-[#E3DAD0]/70 flex items-center justify-between text-xs text-slate-500">
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{readingTimeLabel}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{publishedAtLabel}</span>
+                        </span>
+                      </div>
+
+                      <Link
+                        to={`/blog/${article.slug}`}
+                        className="font-bold text-[#0F1821] group-hover:text-[#C92127] inline-flex items-center gap-1 transition-colors"
+                      >
+                        <span>مطالعه مقاله</span>
+                        <ArrowUpLeft className="w-4 h-4 text-[#C92127]" />
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-20 bg-white/90 rounded-3xl border border-[#E3DAD0] p-8 max-w-xl mx-auto shadow-card">

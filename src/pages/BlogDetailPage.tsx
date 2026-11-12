@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Clock, Calendar, User, Share2, Tag, Check, Copy, ArrowLeft, ArrowUpLeft, Bookmark, HelpCircle } from 'lucide-react';
 import { PageContainer } from '../components/layout/PageContainer';
@@ -7,17 +7,50 @@ import { Breadcrumb } from '../components/layout/Breadcrumb';
 import { Button } from '../components/common/Button';
 import { articlesData } from '../data/articles';
 import { CTASection } from '../components/common/CTASection';
+import { api } from '../services/api';
 
 export const BlogDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [copied, setCopied] = useState(false);
-  const article = articlesData.find((a) => a.slug === slug);
+  const fallbackArticle = articlesData.find((a) => a.slug === slug);
+  const [dynamicArticle, setDynamicArticle] = useState<any | null>(null);
 
-  if (!article) {
+  useEffect(() => {
+    if (slug) {
+      api.articles.getPublicBySlug(slug)
+        .then((res) => {
+          if (res.success && res.data) {
+            setDynamicArticle(res.data);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [slug]);
+
+  const rawArticle = dynamicArticle || fallbackArticle;
+
+  if (!rawArticle) {
     return <Navigate to="/blog" replace />;
   }
 
-  const relatedArticles = articlesData.filter((a) => a.slug !== slug).slice(0, 2);
+  const article = {
+    ...rawArticle,
+    category: rawArticle.category_name || rawArticle.category || 'متالورژی و داده',
+    contentHtml: rawArticle.content_html || rawArticle.contentHtml || '',
+    readingTime: rawArticle.reading_time || rawArticle.readingTime || '۵ دقیقه',
+    publishedAt: rawArticle.published_at || rawArticle.publishedAt || '۱۴۰۳/۰۸',
+    author: rawArticle.author_name || rawArticle.author || 'واحد تحقیق و توسعه معدنکو',
+    tags: Array.isArray(rawArticle.tags) ? rawArticle.tags.map((t: any) => typeof t === 'string' ? t : t.name) : [],
+    tableOfContents: rawArticle.tableOfContents || [
+      { id: 'intro', title: 'مقدمه و طرح مسئله' },
+      { id: 'solution', title: 'تحلیل داده و متالورژی' },
+      { id: 'summary', title: 'جمع‌بندی و نتیجه‌گیری' },
+    ],
+  };
+
+  const relatedArticles = (rawArticle.related && rawArticle.related.length > 0)
+    ? rawArticle.related
+    : articlesData.filter((a) => a.slug !== slug).slice(0, 2);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
