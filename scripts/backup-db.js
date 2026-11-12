@@ -21,24 +21,34 @@ if (!fs.existsSync(backupDir)) {
   fs.mkdirSync(backupDir, { recursive: true });
 }
 
-// Check database integrity before backup
-try {
-  const db = new DatabaseSync(dbPath);
-  const integrity = db.prepare('PRAGMA integrity_check;').get();
-  console.log('✓ Database integrity check:', integrity);
-} catch (err) {
-  console.error('Integrity check failed:', err.message);
-  process.exit(1);
-}
-
+// Perform crash-consistent, WAL-safe SQLite backup using VACUUM INTO
 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 const backupPath = path.join(backupDir, `madanco_backup_${timestamp}.sqlite`);
 
-fs.copyFileSync(dbPath, backupPath);
+try {
+  const db = new DatabaseSync(dbPath);
+  // Verify integrity
+  const integrity = db.prepare('PRAGMA integrity_check;').get();
+  console.log('✓ Source database integrity check:', integrity);
 
-const stats = fs.statSync(backupPath);
-console.log(`=======================================================`);
-console.log(`✓ Backup successfully created!`);
-console.log(`✓ Path: ${backupPath}`);
-console.log(`✓ Size: ${(stats.size / 1024).toFixed(2)} KB`);
-console.log(`=======================================================`);
+  // WAL-safe snapshot
+  const safeDest = backupPath.replace(/\\/g, '/');
+  db.exec(`VACUUM INTO '${safeDest}';`);
+  db.close();
+
+  // Verify backup integrity
+  const testDb = new DatabaseSync(backupPath);
+  const backupIntegrity = testDb.prepare('PRAGMA integrity_check;').get();
+  testDb.close();
+  console.log('✓ Backup database integrity check:', backupIntegrity);
+
+  const stats = fs.statSync(backupPath);
+  console.log(`=======================================================`);
+  console.log(`✓ WAL-safe Backup successfully created!`);
+  console.log(`✓ Path: ${backupPath}`);
+  console.log(`✓ Size: ${(stats.size / 1024).toFixed(2)} KB`);
+  console.log(`=======================================================`);
+} catch (err) {
+  console.error('Backup failed:', err.message);
+  process.exit(1);
+}

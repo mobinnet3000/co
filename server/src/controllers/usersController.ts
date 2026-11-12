@@ -68,7 +68,15 @@ export const usersController = {
         password_hash = COALESCE(?, password_hash),
         updated_at = ?
       WHERE id = ?
-    `).run(full_name, email, role, is_active, passwordHashUpdate, now, id);
+    `).run(
+      full_name ?? null,
+      email ?? null,
+      role ?? null,
+      is_active ?? null,
+      passwordHashUpdate ?? null,
+      now,
+      id
+    );
 
     res.json({ success: true, message: 'اطلاعات کاربر به‌روزرسانی شد.' });
   },

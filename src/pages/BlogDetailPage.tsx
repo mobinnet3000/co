@@ -450,7 +450,7 @@ export const BlogDetailPage: React.FC = () => {
                       بررسی امکانات سامانه فرآوری
                     </Button>
                     <a
-                      href="https://madan.ba3tani.ir"
+                      href="https://madan.co.ir"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full inline-flex items-center justify-center py-2 px-3 rounded-[10px] bg-[#EFA73F] text-[#0F1821] hover:bg-[#D48E28] font-bold text-xs"

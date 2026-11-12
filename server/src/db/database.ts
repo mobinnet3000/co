@@ -12,6 +12,17 @@ if (!fs.existsSync(config.uploadsDir)) {
   fs.mkdirSync(config.uploadsDir, { recursive: true });
 }
 
+// Auto-seed bootstrap if database does not exist but a seed file is present
+const seedPath = path.join(dataDir, 'madanco.sqlite.seed');
+if (!fs.existsSync(config.dbPath) && fs.existsSync(seedPath)) {
+  try {
+    fs.copyFileSync(seedPath, config.dbPath);
+    console.log(`✓ Bootstrapped new database from seed file to: ${config.dbPath}`);
+  } catch (err: any) {
+    console.warn('Notice: Could not copy seed database file:', err?.message);
+  }
+}
+
 export const db = new DatabaseSync(config.dbPath);
 
 // Enable WAL mode and foreign keys for high performance and integrity

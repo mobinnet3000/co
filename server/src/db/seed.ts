@@ -7,16 +7,23 @@ import { config } from '../config';
 export function seedDatabase() {
   const now = new Date().toISOString();
 
-  // 1. Seed Super Admin User if not exists
+  // 1. Seed Super Admin User if not exists (Zero Overwrite & Safe Bootstrap)
   const adminUsername = config.initialAdminUsername || 'admin';
   const userCheck = db.prepare('SELECT id FROM users WHERE username = ?').get(adminUsername);
   if (!userCheck) {
-    const passwordHash = bcrypt.hashSync(config.initialAdminPassword, 10);
-    db.prepare(`
-      INSERT INTO users (username, email, password_hash, full_name, role, is_active, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, 1, ?, ?)
-    `).run(adminUsername, config.initialAdminEmail, passwordHash, 'مدیر ارشد سامانه معدنکو', 'super_admin', now, now);
-    console.log(`✓ Super Admin user initialized for username: "${adminUsername}"`);
+    if (config.initialAdminPassword) {
+      const passwordHash = bcrypt.hashSync(config.initialAdminPassword, 10);
+      db.prepare(`
+        INSERT INTO users (username, email, password_hash, full_name, role, is_active, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, 1, ?, ?)
+      `).run(adminUsername, config.initialAdminEmail, passwordHash, 'مدیر ارشد سامانه معدنکو', 'super_admin', now, now);
+      console.log(`✓ Super Admin user initialized for username: "${adminUsername}"`);
+    } else {
+      console.warn(`[SECURITY NOTICE] Super Admin user "${adminUsername}" does not exist and INITIAL_ADMIN_PASSWORD was not provided.`);
+      console.warn(`  To set up admin account, run: npm run admin:reset-password -- ${adminUsername} <YourSecurePassword>`);
+    }
+  } else {
+    // Existing user preserved untouched
   }
 
   // 2. Seed Default Global Settings
@@ -31,7 +38,7 @@ export function seedDatabase() {
     ['whatsapp', 'https://wa.me/989999196630', 'contact'],
     ['telegram', 'https://t.me/MadanCoSupport', 'contact'],
     ['site_url', 'https://madan.co.ir', 'general'],
-    ['platform_live_url', 'https://madan.ba3tani.ir', 'general'],
+    ['platform_live_url', 'https://madan.co.ir', 'general'],
     ['footer_copyright', 'تمامی حقوق مادی و معنوی متعلق به شرکت محاسبات عملیات داده ارزیابی نوین (نام تجاری معدنکو Madan Co) می‌باشد.', 'footer'],
     ['seo_default_title', 'معدنکو (Madan Co) | فناوری داده در خدمت معدن', 'seo'],
     ['seo_default_keywords', 'معدنکو, madan co, فناوری داده در خدمت معدن, پایش خطوط فرآوری, بهینه‌سازی خطوط فرآوری, محاسبات عملیات داده ارزیابی نوین', 'seo'],

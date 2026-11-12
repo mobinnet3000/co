@@ -49,6 +49,10 @@ try {
 
 // Restore
 fs.copyFileSync(targetBackup, dbPath);
+// Clean stale WAL/SHM files if present
+if (fs.existsSync(`${dbPath}-wal`)) fs.unlinkSync(`${dbPath}-wal`);
+if (fs.existsSync(`${dbPath}-shm`)) fs.unlinkSync(`${dbPath}-shm`);
+
 console.log(`=======================================================`);
 console.log(`✓ Database restored successfully from: ${targetBackup}`);
 console.log(`✓ Active database target: ${dbPath}`);

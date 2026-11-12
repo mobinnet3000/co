@@ -84,7 +84,7 @@ export const mediaController = {
         alt_text = COALESCE(?, alt_text),
         title = COALESCE(?, title)
       WHERE id = ?
-    `).run(alt_text, title, id);
+    `).run(alt_text ?? null, title ?? null, id);
 
     res.json({ success: true, message: 'مشخصات فایل به‌روزرسانی شد.' });
   },

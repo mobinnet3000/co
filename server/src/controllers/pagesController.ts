@@ -149,19 +149,19 @@ export const pagesController = {
         updated_at = ?
       WHERE id = ?
     `).run(
-      title,
-      cleanSlug,
-      excerpt,
-      content,
-      status,
-      scheduled_at,
-      parent_id,
-      template,
-      seo_title,
-      seo_description,
-      focus_keyword,
-      canonical_url,
-      og_image,
+      title ?? null,
+      cleanSlug ?? null,
+      excerpt ?? null,
+      content ?? null,
+      status ?? null,
+      scheduled_at ?? null,
+      parent_id ?? null,
+      template ?? null,
+      seo_title ?? null,
+      seo_description ?? null,
+      focus_keyword ?? null,
+      canonical_url ?? null,
+      og_image ?? null,
       now,
       id
     );

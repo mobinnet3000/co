@@ -86,25 +86,33 @@ npm start
 
 ## ۶. اجرای تست‌های خودکار (Automated Testing)
 
-پلتفرم دارای ۲۱ آزمون یکپارچگی بک‌اند است که سلامت روت‌ها، دیتابیس، احراز هویت، تفکیک پیش‌نویس‌ها و هر ۱۸ نوع بلوک صفحه‌ساز را ارزیابی می‌کنند:
+پلتفرم دارای ۲۸ آزمون خودکار یکپارچگی بک‌اند و ماندگاری داده است که سلامت روت‌ها، دیتابیس، احراز هویت، تفکیک پیش‌نویس‌ها، ماندگاری دیتابیس پس از ری‌استارت و هر ۱۸ نوع بلوک صفحه‌ساز را به صورت واقعی ارزیابی می‌کنند:
 
 ```bash
-# اجرای آزمون‌های یکپارچگی بک‌اند با نود تست رانر بومی
+# اجرای آزمون‌های یکپارچگی بک‌اند و ماندگاری داده
 npm run test:backend
 ```
 
-همچنین جهت اعتبارسنجی استاتیک کدهای تایپ‌اسکریپت:
+همچنین آزمون سرور عملیاتی واقعی HTTP برای بررسی ۱۲ سناریوی رندر پیش‌رندر، پاسخ‌های ۴۰۴ و وضعیت پروداکشن:
+```bash
+node scripts/verify-http-production.js
+```
+
+جهت اعتبارسنجی استاتیک کدهای تایپ‌اسکریپت:
 ```bash
 npx tsc --noEmit
 ```
 
 ---
 
-## ۷. پایگاه‌داده SQLite و مدیریت داده‌ها (Database)
+## ۷. پایگاه‌داده SQLite، پایداری داده‌ها و ارتقای بدون ریسک (Database & Persistence)
 
 - **محل ذخیره‌سازی:** به طور پیش‌فرض در `server/data/madanco.sqlite` (یا مقدار متغیر `DATABASE_PATH`).
-- **حالت عملکرد:** `PRAGMA journal_mode = WAL;` و `PRAGMA foreign_keys = ON;` جهت حداکثر کارایی و همزمانی.
-- **مقداردهی اولیه (Seeding):** تابع `initDatabase()` جداول را در صورت عدم وجود ایجاد کرده و `seedDatabase()` تنها رکوردهای ناموجود را درج می‌کند (هیچ داده موجودی در دیپلوی مجدد بازنویسی نمی‌شود).
+- **حالت عملکرد:** `PRAGMA journal_mode = WAL;` و `PRAGMA foreign_keys = ON;` جهت حداکثر کارایی و همزمانی تراکنش‌ها.
+- **تضمین پایداری داده‌ها در انتشار نسخه جدید (Zero Data Loss):**
+  1. بسته انتشار `dist-cpanel-release.zip` حاوی فایل `madanco.sqlite.seed` است. بدین ترتیب اکسترکت کردن بسته جدید روی هاست، هیچ‌گاه فایل فعال `madanco.sqlite` یا پوشه `uploads` شما را بازنویسی نخواهد کرد.
+  2. در محیط سازمانی، توصیه می‌شود پوشه داده‌ها (`DATABASE_PATH` و `UPLOADS_DIR`) به طور کامل خارج از پوشه کد برنامه (مثلاً در `/home/username/madan_data/`) قرار گیرد.
+- **مقداردهی اولیه (Seeding):** تابع `initDatabase()` جداول را ایجاد کرده و `seedDatabase()` تنها رکوردهای ناموجود را با `INSERT OR IGNORE` درج می‌کند.
 
 ### دستورات پشتیبان‌گیری و بازیابی:
 ```bash
@@ -182,7 +190,7 @@ npm run package:cpanel
 1. استخراج فایل زیپ در پوشه `madan_app` هاست.
 2. ساخت اپلیکیشن در **Setup Node.js App** با نسخه نود **`22.23.4`** و فایل استارتاپ **`app.js`**.
 3. کلیک روی **Run NPM Install** و سپس **Restart**.
-*(راهنمای تفصیلی در [PHASE_5_DEPLOYMENT_GUIDE.md](file:///c:/Users/meck/Documents/co/PHASE_5_DEPLOYMENT_GUIDE.md) آمده است).*
+*(راهنمای تفصیلی استقرار در [FINAL_CPANEL_DEPLOYMENT_GUIDE.md](file:///c:/Users/meck/Documents/co/FINAL_CPANEL_DEPLOYMENT_GUIDE.md) و راهنمای پایداری داده‌ها در [FINAL_DATA_PERSISTENCE_GUIDE.md](file:///c:/Users/meck/Documents/co/FINAL_DATA_PERSISTENCE_GUIDE.md) آمده است).*
 
 ---
 

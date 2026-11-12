@@ -142,7 +142,7 @@ export const IndustryDetailPage: React.FC = () => {
                       آشنایی کامل با ماژول‌های سامانه
                     </Button>
                     <a
-                      href="https://madan.ba3tani.ir"
+                      href="https://madan.co.ir"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[10px] border border-[#E3DAD0] text-white hover:bg-white/10 text-xs font-semibold"

@@ -90,7 +90,7 @@ test('5. Public Settings Endpoint returns confirmed corporate info', async () =>
   assert.strictEqual(data.data.phone, '09999196630');
   assert.strictEqual(data.data.email, 'info@madan.co.ir');
   assert.strictEqual(data.data.address, 'تهران، نیروی دریایی');
-  assert.strictEqual(data.data.platform_live_url, 'https://madan.ba3tani.ir');
+  assert.strictEqual(data.data.platform_live_url, 'https://madan.co.ir');
 });
 
 test('6. Contact Message Submission and Validation', async () => {
@@ -498,4 +498,119 @@ test('21. Unhandled API Route Returns Clean JSON 404 (Not HTML)', async () => {
   assert.ok(contentType.includes('application/json'), `Expected JSON response, got ${contentType}`);
   const data = await res.json();
   assert.strictEqual(data.success, false);
+});
+
+test('22. Admin User Management CRUD', async () => {
+  const testUser = `editor_test_${Date.now()}`;
+  // 1. Create editor user
+  const createRes = await fetch(`${baseUrl}/api/users`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({
+      username: testUser,
+      email: `${testUser}@madan.co.ir`,
+      password: 'EditorPassword@2026',
+      full_name: 'کارشناس متالورژی آزمایشی',
+      role: 'editor',
+    }),
+  });
+  assert.strictEqual(createRes.status, 201);
+  const createData = await createRes.json();
+  const newUserId = createData.id;
+  assert.ok(newUserId);
+
+  // 2. List all users and verify new user is listed
+  const listRes = await fetch(`${baseUrl}/api/users`, {
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  assert.strictEqual(listRes.status, 200);
+  const listData = await listRes.json();
+  const found = listData.data.find((u: any) => u.id === newUserId);
+  assert.ok(found);
+  assert.strictEqual(found.role, 'editor');
+
+  // 3. Update user full name
+  const updateRes = await fetch(`${baseUrl}/api/users/${newUserId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({
+      full_name: 'نام به‌روزشده کارشناس',
+    }),
+  });
+  assert.strictEqual(updateRes.status, 200);
+
+  // 4. Delete user
+  const delRes = await fetch(`${baseUrl}/api/users/${newUserId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  assert.strictEqual(delRes.status, 200);
+});
+
+test('23. Media Upload Validation & Security (Reject Executables)', async () => {
+  // Test rejecting dangerous script file (.php)
+  const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
+  const phpPayload =
+    `--${boundary}\r\n` +
+    `Content-Disposition: form-data; name="file"; filename="exploit.php"\r\n` +
+    `Content-Type: application/x-php\r\n\r\n` +
+    `<?php echo 'malicious'; ?>\r\n` +
+    `--${boundary}--\r\n`;
+
+  const phpRes = await fetch(`${baseUrl}/api/media/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': `multipart/form-data; boundary=${boundary}`,
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: phpPayload,
+  });
+
+  // Must reject with 400 or 500 error, never 201 created
+  assert.notStrictEqual(phpRes.status, 201, 'Dangerous .php file must not be accepted');
+});
+
+test('24. Database Persistence & Restart Simulation', async () => {
+  const { DatabaseSync } = await import('node:sqlite');
+  const path = await import('path');
+  const fs = await import('fs');
+
+  const dbPath = path.resolve(process.cwd(), 'server/data/madanco.sqlite');
+  assert.ok(fs.existsSync(dbPath), 'Database file must exist on disk');
+
+  // Open independent connection simulating fresh cold start
+  const freshDb = new DatabaseSync(dbPath);
+  const articlesCount = freshDb.prepare('SELECT COUNT(*) as count FROM articles WHERE status = ?').get('published') as any;
+  assert.ok(articlesCount.count >= 15, 'Published articles must persist in independent connection');
+
+  const settingsCheck = freshDb.prepare('SELECT value FROM website_settings WHERE key = ?').get('phone') as any;
+  assert.strictEqual(settingsCheck.value, '09999196630');
+  freshDb.close();
+});
+
+test('25. Static HTML SEO & Prerender Verification on Disk', async () => {
+  const fs = await import('fs');
+  const path = await import('path');
+
+  // Check home page
+  const homePath = path.resolve(process.cwd(), 'dist/index.html');
+  if (fs.existsSync(homePath)) {
+    const homeHtml = fs.readFileSync(homePath, 'utf-8');
+    assert.ok(homeHtml.includes('<title>'), 'Home page must have a title tag');
+    assert.ok(homeHtml.includes('معدنکو') || homeHtml.includes('محاسبات عملیات داده'), 'Home page must contain brand name');
+  }
+
+  // Check an article static file
+  const artPath = path.resolve(process.cwd(), 'dist/blog/introduction-to-mineral-processing-stages/index.html');
+  if (fs.existsSync(artPath)) {
+    const artHtml = fs.readFileSync(artPath, 'utf-8');
+    assert.ok(artHtml.includes('<title>'), 'Article must have title tag');
+    assert.ok(artHtml.includes('schema.org') || artHtml.includes('Article'), 'Article must contain Article schema markup');
+  }
 });

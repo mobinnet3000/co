@@ -31,14 +31,14 @@ export const app = express();
 // Trust proxy for secure cookies/IP tracking
 app.set('trust proxy', 1);
 
-// Security & Parsing Middlewares
+// Strict CORS configuration
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow local development and specified production origins, or requests with no origin (like mobile/curl)
-    if (!origin || config.corsOrigins.includes(origin) || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+    // Allow same-origin requests (no origin header), curl, health checks, or whitelisted domains
+    if (!origin || config.corsOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(null, true); // Permissive in self-hosted setup, origin checked in headers
+      callback(new Error(`CORS access denied for origin: ${origin}`));
     }
   },
   credentials: true,
@@ -102,13 +102,7 @@ app.use(errorHandler);
 
 // Production Frontend Static & SPA Serving (when dist exists)
 if (fs.existsSync(config.distDir)) {
-  // 1. Serve static assets with caching
-  app.use(express.static(config.distDir, {
-    index: false,
-    maxAge: config.nodeEnv === 'production' ? '7d' : 0,
-  }));
-
-  // 2. Prerendered HTML checks & SPA fallback for GET requests
+  // 1. Check exact prerendered HTML page match first (avoids unwanted 301 trailing-slash redirects)
   app.use((req, res, next) => {
     if (req.method !== 'GET') {
       return next();
@@ -125,9 +119,34 @@ if (fs.existsSync(config.distDir)) {
       if (fs.existsSync(prerenderedPath)) {
         return res.sendFile(prerenderedPath);
       }
+    } else {
+      // Root route '/'
+      const rootPrerender = path.join(config.distDir, 'index.html');
+      if (fs.existsSync(rootPrerender)) {
+        return res.sendFile(rootPrerender);
+      }
     }
 
-    // Default SPA fallback
+    next();
+  });
+
+  // 2. Serve static assets with caching (CSS, JS, fonts, images)
+  app.use(express.static(config.distDir, {
+    index: false,
+    redirect: false,
+    maxAge: config.nodeEnv === 'production' ? '7d' : 0,
+  }));
+
+  // 3. SPA Fallback for client-side routing (e.g. /admin/login)
+  app.use((req, res, next) => {
+    if (req.method !== 'GET') {
+      return next();
+    }
+
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+
     const indexPath = path.join(config.distDir, 'index.html');
     if (fs.existsSync(indexPath)) {
       return res.sendFile(indexPath);
@@ -137,18 +156,41 @@ if (fs.existsSync(config.distDir)) {
   });
 }
 
-// Start server if executed directly (and not in node test runner)
-const isTestRunner = process.env.NODE_ENV === 'test' || process.env.NODE_TEST_CONTEXT !== undefined || process.argv.some(arg => arg.includes('test'));
+// Startup error handlers for Passenger logging
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL] Uncaught Exception at:', new Date().toISOString(), err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[FATAL] Unhandled Promise Rejection at:', new Date().toISOString(), reason);
+});
+
+// Start server if executed directly (and not in node test/verify runner)
+const isTestRunner = process.env.NODE_ENV === 'test' || process.env.NODE_TEST_CONTEXT !== undefined || process.argv.some(arg => arg.includes('test') || arg.includes('verify'));
 if (!isTestRunner) {
-  app.listen(config.port, '0.0.0.0', () => {
-    console.log(`=======================================================`);
-    console.log(`✓ MadanCo Production Server running on port ${config.port}`);
-    console.log(`✓ Environment: ${config.nodeEnv}`);
-    console.log(`✓ Database: SQLite (WAL Mode enabled)`);
-    console.log(`✓ Frontend: Serving from ${config.distDir}`);
-    console.log(`✓ Health: http://localhost:${config.port}/health`);
-    console.log(`=======================================================`);
-  });
+  const target = config.port;
+  if (typeof target === 'number') {
+    app.listen(target, '0.0.0.0', () => {
+      console.log(`=======================================================`);
+      console.log(`✓ MadanCo Production Server running on port ${target}`);
+      console.log(`✓ Environment: ${config.nodeEnv}`);
+      console.log(`✓ Database: SQLite (${config.dbPath})`);
+      console.log(`✓ Uploads Directory: ${config.uploadsDir}`);
+      console.log(`✓ Frontend: Serving from ${config.distDir}`);
+      console.log(`✓ Health: http://localhost:${target}/health`);
+      console.log(`=======================================================`);
+    });
+  } else {
+    // Unix domain socket provided by Phusion Passenger
+    app.listen(target, () => {
+      console.log(`=======================================================`);
+      console.log(`✓ MadanCo Production Server running on Passenger socket: ${target}`);
+      console.log(`✓ Environment: ${config.nodeEnv}`);
+      console.log(`✓ Database: SQLite (${config.dbPath})`);
+      console.log(`✓ Uploads Directory: ${config.uploadsDir}`);
+      console.log(`✓ Frontend: Serving from ${config.distDir}`);
+      console.log(`=======================================================`);
+    });
+  }
 }
 
 export default app;

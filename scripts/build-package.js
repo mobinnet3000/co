@@ -49,26 +49,66 @@ console.log('Copying distribution files to staging...');
 copyRecursive(clientDist, path.join(stageDir, 'dist'));
 copyRecursive(path.join(rootDir, 'server', 'dist'), path.join(stageDir, 'server', 'dist'));
 
-// Copy initial seed database if exists
+// 3. Create a clean, WAL-safe snapshot for the seed database
 const dbFile = path.join(rootDir, 'server', 'data', 'madanco.sqlite');
 if (fs.existsSync(dbFile)) {
-  copyRecursive(dbFile, path.join(stageDir, 'server', 'data', 'madanco.sqlite'));
+  fs.mkdirSync(path.join(stageDir, 'server', 'data'), { recursive: true });
+  const seedDest = path.join(stageDir, 'server', 'data', 'madanco.sqlite.seed');
+  try {
+    const { DatabaseSync } = await import('node:sqlite');
+    const liveDb = new DatabaseSync(dbFile);
+    const safeDest = seedDest.replace(/\\/g, '/');
+    liveDb.exec(`VACUUM INTO '${safeDest}';`);
+    liveDb.close();
+
+    // Verify snapshot
+    const testDb = new DatabaseSync(seedDest);
+    const integrity = testDb.prepare('PRAGMA integrity_check;').get();
+    testDb.close();
+    console.log('✓ Created clean WAL-safe seed database snapshot. Integrity:', integrity);
+  } catch (err) {
+    console.warn('Notice: Could not generate vacuum snapshot, continuing without seed file:', err.message);
+  }
 }
 
 // Create empty uploads directory placeholder
-fs.mkdirSync(path.join(stageDir, 'server', 'data', 'uploads'), { recursive: true });
+fs.mkdirSync(path.join(stageDir, 'server', 'uploads'), { recursive: true });
+fs.mkdirSync(path.join(stageDir, 'server', 'data'), { recursive: true });
+fs.mkdirSync(path.join(stageDir, 'server', 'backups'), { recursive: true });
 
 // Copy scripts
 fs.mkdirSync(path.join(stageDir, 'scripts'), { recursive: true });
-['reset-admin-password.js', 'backup-db.js', 'restore-db.js'].forEach(script => {
+['reset-admin-password.js', 'backup-db.js', 'restore-db.js', 'verify-http-production.js'].forEach(script => {
   const src = path.join(rootDir, 'scripts', script);
   if (fs.existsSync(src)) {
     fs.copyFileSync(src, path.join(stageDir, 'scripts', script));
   }
 });
 
-// Copy root deployment files
-['app.js', 'package.json', 'package-lock.json', '.env.example'].forEach(file => {
+// Copy root deployment files & final documentation reports
+const rootFiles = [
+  'app.js',
+  'package.json',
+  'package-lock.json',
+  '.env.example',
+  '.env.production.example',
+  'DEVELOP.md',
+  'CPANEL_DEPLOYMENT_FA.md',
+  'FINAL_PRODUCTION_AUDIT.md',
+  'FINAL_PRODUCTION_TESTS.md',
+  'FINAL_PRODUCTION_SECURITY.md',
+  'FINAL_PRODUCTION_SEO.md',
+  'FINAL_CPANEL_DEPLOYMENT_GUIDE.md',
+  'FINAL_DATA_PERSISTENCE_GUIDE.md',
+  'FINAL_HANDOVER.md',
+  'FINAL_ACCEPTANCE_REPORT.md',
+  'FINAL_TEST_REPORT.md',
+  'FINAL_SECURITY_REPORT.md',
+  'FINAL_SEO_REPORT.md',
+  'FINAL_KNOWN_ISSUES.md'
+];
+
+rootFiles.forEach(file => {
   const src = path.join(rootDir, file);
   if (fs.existsSync(src)) {
     fs.copyFileSync(src, path.join(stageDir, file));
