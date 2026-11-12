@@ -9,7 +9,9 @@
     "server": "tsx server/src/index.ts",
     "build": "tsc && vite build && node scripts/prerender.js",
     "preview": "vite preview",
-    "test:backend": "tsx --test server/test/backend.test.ts"
+    "test:backend": "tsx --test server/test/backend.test.ts",
+    "db:backup": "node scripts/backup-db.js",
+    "db:restore": "node scripts/restore-db.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

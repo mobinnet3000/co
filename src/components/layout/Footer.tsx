@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, MapPin, Phone, ArrowUpLeft, ExternalLink } from 'lucide-react';
 import { companyData } from '../../data/company';
 import { Logo } from '../common/Logo';
+import { api } from '../../services/api';
 
 export const Footer: React.FC = () => {
+  const [footerLinks, setFooterLinks] = useState<Array<{ title: string; url: string }>>([
+    { title: 'صفحه اصلی', url: '/' },
+    { title: 'معرفی سامانه پایش', url: '/platform' },
+    { title: 'خدمات مهندسی', url: '/services' },
+    { title: 'درباره ما', url: '/about' },
+    { title: 'شناسنامه رسمی شرکت', url: '/company' },
+    { title: 'ارتباط با ما', url: '/contact' },
+  ]);
+
+  useEffect(() => {
+    api.menus.getPublicBySlug('footer')
+      .then((res) => {
+        if (res.success && res.items && res.items.length > 0) {
+          setFooterLinks(res.items.map((it: any) => ({ title: it.title, url: it.url })));
+        }
+      })
+      .catch(() => {});
+  }, []);
   return (
     <footer className="bg-brand-sand text-[#0F1821] pt-12 pb-8 border-t border-[#E3DAD0] relative overflow-hidden select-none">
       {/* Background Architectural Guidelines - Ultra Minimal */}
@@ -71,47 +90,15 @@ export const Footer: React.FC = () => {
         {/* Middle Section: Essential Minimal Navigation Links */}
         <div className="py-6 flex flex-wrap items-center justify-between gap-4 text-xs font-vazir">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-slate-700">
-            <Link
-              to="/"
-              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
-            >
-              صفحه اصلی
-            </Link>
-
-            <Link
-              to="/platform"
-              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
-            >
-              معرفی سامانه پایش
-            </Link>
-
-            <Link
-              to="/services"
-              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
-            >
-              خدمات مهندسی
-            </Link>
-
-            <Link
-              to="/about"
-              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
-            >
-              درباره ما
-            </Link>
-
-            <Link
-              to="/company"
-              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
-            >
-              شناسنامه رسمی شرکت
-            </Link>
-
-            <Link
-              to="/contact"
-              className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
-            >
-              ارتباط با ما
-            </Link>
+            {footerLinks.map((link, idx) => (
+              <Link
+                key={idx}
+                to={link.url}
+                className="px-3 py-1.5 rounded-[8px] bg-white/60 border border-transparent hover:border-[#E3DAD0] hover:text-navy-950 transition-colors"
+              >
+                {link.title}
+              </Link>
+            ))}
           </div>
 
           {/* Direct Live Platform Access Button */}

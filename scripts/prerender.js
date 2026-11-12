@@ -1,12 +1,48 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { DatabaseSync } from 'node:sqlite';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const distDir = path.resolve(__dirname, '../dist');
+const dbPath = path.resolve(__dirname, '../server/data/madanco.sqlite');
 
-// Define all routes to prerender
+// Query dynamic articles from SQLite to include in static HTML generation
+const dynamicArticleRoutes = [];
+if (fs.existsSync(dbPath)) {
+  try {
+    const db = new DatabaseSync(dbPath);
+    const publishedArticles = db.prepare("SELECT title, slug, summary, content_html, seo_title, seo_description, focus_keyword, canonical_url, published_at FROM articles WHERE status = 'published'").all();
+
+    for (const art of publishedArticles) {
+      dynamicArticleRoutes.push({
+        path: `/blog/${art.slug}`,
+        title: `${art.seo_title || art.title} | دانشنامه معدنکو`,
+        description: art.seo_description || art.summary,
+        keywords: art.focus_keyword || 'فرآوری مواد معدنی, متالورژی, کانی آرایی, تحلیل داده',
+        canonical: art.canonical_url || `https://madan.co.ir/blog/${art.slug}`,
+        jsonLd: {
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: art.title,
+          description: art.summary,
+          url: art.canonical_url || `https://madan.co.ir/blog/${art.slug}`,
+          publisher: {
+            '@type': 'Organization',
+            name: 'شرکت محاسبات عملیات داده ارزیابی نوین با مسئولیت محدود',
+            logo: 'https://madan.co.ir/favicon.svg',
+          },
+        },
+        bodyContent: `<div class="ssr-prerender-seo" style="display:none"><h1>${art.title}</h1><p>${art.summary}</p><div>${art.content_html}</div></div>`,
+      });
+    }
+  } catch (err) {
+    console.warn('Notice: SQLite query during prerender:', err.message);
+  }
+}
+
+// Define all base routes to prerender
 const routes = [
   {
     path: '/',
@@ -164,6 +200,15 @@ const routes = [
   },
 ];
 
+// Merge dynamic articles into prerender routes (ensuring full SEO coverage)
+const existingPaths = new Set(routes.map((r) => r.path));
+for (const artRoute of dynamicArticleRoutes) {
+  if (!existingPaths.has(artRoute.path)) {
+    routes.push(artRoute);
+    existingPaths.add(artRoute.path);
+  }
+}
+
 console.log('--- Starting Static Build-Time SEO Prerendering ---');
 
 const templateHtmlPath = path.join(distDir, 'index.html');
@@ -205,6 +250,17 @@ routes.forEach((route) => {
     /<meta property="og:description" content=".*?" \/>/i,
     `<meta property="og:description" content="${route.description}" />`
   );
+
+  // Inject JSON-LD Schema if present
+  if (route.jsonLd) {
+    const jsonLdScript = `\n  <script type="application/ld+json">\n${JSON.stringify(route.jsonLd, null, 2)}\n  </script>`;
+    html = html.replace('</head>', `${jsonLdScript}\n  </head>`);
+  }
+
+  // Inject Body Content for search engine crawlers if present
+  if (route.bodyContent) {
+    html = html.replace('<div id="root"></div>', `<div id="root">${route.bodyContent}</div>`);
+  }
 
   // Output destination
   if (route.path === '/') {

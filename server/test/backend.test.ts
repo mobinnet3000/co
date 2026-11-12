@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'test';
+
 import test from 'node:test';
 import assert from 'node:assert';
 import http from 'node:http';
@@ -22,7 +24,17 @@ test.before(async () => {
 
 test.after(async () => {
   return new Promise<void>((resolve) => {
-    server.close(() => resolve());
+    if (server) {
+      server.closeAllConnections?.();
+      server.close(() => {
+        resolve();
+        setImmediate(() => process.exit(0));
+      });
+      server.unref();
+    } else {
+      resolve();
+      setImmediate(() => process.exit(0));
+    }
   });
 });
 
@@ -234,4 +246,181 @@ test('10. SEO Infrastructure (Overview, Dynamic Sitemap XML, Robots.txt)', async
   const robotsTxt = await robotsRes.text();
   assert.ok(robotsTxt.includes('Disallow: /admin'));
   assert.ok(robotsTxt.includes('Sitemap: https://madan.co.ir/sitemap.xml'));
+});
+
+test('11. Dynamic Page Sections (Public Slug, Admin Create, Reorder, Delete)', async () => {
+  // Public sections for 'home' page
+  const homeSecRes = await fetch(`${baseUrl}/api/sections/public/slug/home`);
+  assert.strictEqual(homeSecRes.status, 200);
+  const homeSec = await homeSecRes.json();
+  assert.strictEqual(homeSec.success, true);
+  assert.ok(homeSec.data.length >= 3);
+  assert.ok(homeSec.data[0].section_type);
+
+  // Admin list sections for page id 1
+  const adminSecRes = await fetch(`${baseUrl}/api/sections/page/1`, {
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  assert.strictEqual(adminSecRes.status, 200);
+  const adminSec = await adminSecRes.json();
+  assert.strictEqual(adminSec.success, true);
+
+  // Create a new section
+  const createSecRes = await fetch(`${baseUrl}/api/sections/page/1`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({
+      section_type: 'faq',
+      config_json: JSON.stringify({ title: 'سوالات متداول تستی', items: [] }),
+    }),
+  });
+  assert.strictEqual(createSecRes.status, 201);
+  const createData = await createSecRes.json();
+  assert.ok(createData.id);
+
+  // Update section
+  const updateSecRes = await fetch(`${baseUrl}/api/sections/${createData.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({
+      config_json: JSON.stringify({ title: 'سوالات متداول بروزرسانی‌شده', items: [{ q: 'تست', a: 'پاسخ' }] }),
+    }),
+  });
+  assert.strictEqual(updateSecRes.status, 200);
+
+  // Delete section
+  const delSecRes = await fetch(`${baseUrl}/api/sections/${createData.id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  assert.strictEqual(delSecRes.status, 200);
+});
+
+test('12. Navigation Menus & Nested Tree Management', async () => {
+  // Public header menu
+  const headerRes = await fetch(`${baseUrl}/api/menus/public/header`);
+  assert.strictEqual(headerRes.status, 200);
+  const headerData = await headerRes.json();
+  assert.strictEqual(headerData.success, true);
+  assert.ok(headerData.items.length >= 5);
+
+  // Public all menus
+  const allPubRes = await fetch(`${baseUrl}/api/menus/public/all`);
+  assert.strictEqual(allPubRes.status, 200);
+  const allPub = await allPubRes.json();
+  assert.ok(allPub.data.header);
+  assert.ok(allPub.data.footer);
+
+  // Admin list menus
+  const adminMenusRes = await fetch(`${baseUrl}/api/menus`, {
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  assert.strictEqual(adminMenusRes.status, 200);
+  const adminMenus = await adminMenusRes.json();
+  assert.ok(adminMenus.data.length >= 2);
+});
+
+test('13. Knowledge Base Scale: Verify >= 15 High-Quality Technical Articles', async () => {
+  const articlesRes = await fetch(`${baseUrl}/api/articles/public?limit=50`);
+  assert.strictEqual(articlesRes.status, 200);
+  const articlesData = await articlesRes.json();
+  assert.strictEqual(articlesData.success, true);
+  assert.ok(articlesData.data.length >= 15, `Expected >= 15 articles, got ${articlesData.data.length}`);
+
+  // Verify first article structure and deep content
+  const firstSlug = articlesData.data[0].slug;
+  const detailRes = await fetch(`${baseUrl}/api/articles/public/${firstSlug}`);
+  assert.strictEqual(detailRes.status, 200);
+  const detail = await detailRes.json();
+  assert.ok(detail.data.content_html.length > 500);
+  assert.ok(detail.data.seo_title);
+  assert.ok(detail.data.seo_description);
+});
+
+test('14. Analytics Collection & Admin Metrics Dashboard', async () => {
+  // Track pageview
+  const trackRes = await fetch(`${baseUrl}/api/analytics/collect`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event_type: 'pageview',
+      path: '/platform',
+      referrer: 'https://google.com',
+    }),
+  });
+  assert.strictEqual(trackRes.status, 200);
+
+  // Get admin analytics dashboard
+  const dashRes = await fetch(`${baseUrl}/api/analytics/dashboard`, {
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  assert.strictEqual(dashRes.status, 200);
+  const dashData = await dashRes.json();
+  assert.strictEqual(dashData.success, true);
+  assert.ok(dashData.stats.totalViews >= 1);
+  assert.ok(dashData.stats.totalArticles >= 15);
+  assert.ok(dashData.stats.totalPages >= 6);
+  assert.ok(Array.isArray(dashData.topPaths));
+});
+
+test('15. Global Admin Search across all entities', async () => {
+  const searchRes = await fetch(`${baseUrl}/api/search/admin?q=فرآوری`, {
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  assert.strictEqual(searchRes.status, 200);
+  const searchData = await searchRes.json();
+  assert.strictEqual(searchData.success, true);
+  assert.ok(searchData.data.articles.length > 0 || searchData.data.pages.length > 0);
+});
+
+test('16. Editorial Publishing Workflow & Draft Isolation', async () => {
+  // Public search must only return published articles
+  const pubRes = await fetch(`${baseUrl}/api/articles/public?limit=100`);
+  assert.strictEqual(pubRes.status, 200);
+  const pubData = await pubRes.json();
+  assert.strictEqual(pubData.success, true);
+  for (const art of pubData.data) {
+    assert.strictEqual(art.status, 'published');
+  }
+
+  // Admin view must see both published and drafts (25 total)
+  const adminRes = await fetch(`${baseUrl}/api/articles`, {
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  assert.strictEqual(adminRes.status, 200);
+  const adminData = await adminRes.json();
+  assert.strictEqual(adminData.success, true);
+  assert.ok(adminData.data.length >= 25, `Expected >= 25 total articles (15 published + 10 drafts), got ${adminData.data.length}`);
+});
+
+test('17. Extended Page Builder Block Types Support', async () => {
+  const newBlocks = ['gallery', 'timeline', 'services_grid', 'downloads'];
+  for (const type of newBlocks) {
+    const res = await fetch(`${baseUrl}/api/sections/page/1`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        section_type: type,
+        config_json: JSON.stringify({ title: `بلوک آزمایشی ${type}`, items: [] }),
+      }),
+    });
+    assert.strictEqual(res.status, 201, `Failed creating section of type: ${type}`);
+    const data = await res.json();
+    assert.ok(data.id);
+
+    // Clean up
+    await fetch(`${baseUrl}/api/sections/${data.id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+  }
 });

@@ -15,6 +15,7 @@ import {
   X,
   Shield,
   Layers,
+  Compass,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
@@ -27,6 +28,12 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState<number>(0);
 
+  // Global Admin Search State
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<any | null>(null);
+  const [searching, setSearching] = useState<boolean>(false);
+  const [searchDropdownOpen, setSearchDropdownOpen] = useState<boolean>(false);
+
   useEffect(() => {
     // Fetch unread count for badge
     api.messages.getAll({ limit: 1 })
@@ -36,9 +43,34 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
       .catch(() => {});
   }, [location.pathname]);
 
+  // Handle live global search with debounce
+  useEffect(() => {
+    if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+      setSearchResults(null);
+      setSearchDropdownOpen(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setSearching(true);
+      api.search.admin(searchQuery.trim())
+        .then((res) => {
+          if (res.success) {
+            setSearchResults(res.data);
+            setSearchDropdownOpen(true);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setSearching(false));
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const navItems = [
     { label: 'داشبورد کلی', path: '/admin', icon: LayoutDashboard },
     { label: 'مدیریت صفحات (CMS)', path: '/admin/pages', icon: Layers },
+    { label: 'منوها و ناوبری', path: '/admin/menus', icon: Compass },
     { label: 'مقالات و دانشنامه', path: '/admin/blog', icon: BookOpen },
     { label: 'کتابخانه رسانه‌ها', path: '/admin/media', icon: ImageIcon },
     {
@@ -171,9 +203,120 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
             >
               <Menu className="w-5 h-5" />
             </button>
-            <span className="font-bold text-sm text-navy-950">
-              سامانه یکپارچه مدیریت محتوا و ارتباطات (MadanCo CMS)
+            <span className="hidden xl:inline-block font-bold text-sm text-navy-950">
+              سامانه مدیریت معدنکو
             </span>
+          </div>
+
+          {/* Central Admin Global Search Bar */}
+          <div className="relative flex-1 max-w-md mx-4">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="جستجوی همه‌منظوره (صفحات، مقالات، پیام‌ها، رسانه‌ها...)"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => {
+                  if (searchResults) setSearchDropdownOpen(true);
+                }}
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-100/80 border border-slate-200 text-xs text-navy-950 focus:bg-white focus:outline-none focus:border-navy-900 transition-all"
+              />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            </div>
+
+            {/* Dropdown Results */}
+            {searchDropdownOpen && searchResults && (
+              <div className="absolute top-full mt-2 right-0 left-0 bg-white rounded-2xl border border-slate-200 shadow-2xl z-50 p-3 max-h-96 overflow-y-auto space-y-3 text-xs">
+                {/* Pages */}
+                {searchResults.pages?.length > 0 && (
+                  <div>
+                    <span className="font-bold text-slate-400 text-[10px] block mb-1">صفحات CMS</span>
+                    <div className="space-y-1">
+                      {searchResults.pages.map((p: any) => (
+                        <Link
+                          key={p.id}
+                          to="/admin/pages"
+                          onClick={() => setSearchDropdownOpen(false)}
+                          className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors"
+                        >
+                          <span className="font-bold text-navy-950">{p.title}</span>
+                          <span className="font-mono text-slate-400 text-[10px]">/{p.slug}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Articles */}
+                {searchResults.articles?.length > 0 && (
+                  <div className="border-t border-slate-100 pt-2">
+                    <span className="font-bold text-slate-400 text-[10px] block mb-1">مقالات دانشنامه</span>
+                    <div className="space-y-1">
+                      {searchResults.articles.map((a: any) => (
+                        <Link
+                          key={a.id}
+                          to="/admin/blog"
+                          onClick={() => setSearchDropdownOpen(false)}
+                          className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors"
+                        >
+                          <span className="font-bold text-navy-950 truncate max-w-[280px]">{a.title}</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded ${a.status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                            {a.status === 'published' ? 'منتشر' : 'پیش‌نویس'}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Messages */}
+                {searchResults.messages?.length > 0 && (
+                  <div className="border-t border-slate-100 pt-2">
+                    <span className="font-bold text-slate-400 text-[10px] block mb-1">پیام‌ها و استعلام‌ها</span>
+                    <div className="space-y-1">
+                      {searchResults.messages.map((m: any) => (
+                        <Link
+                          key={m.id}
+                          to="/admin/messages"
+                          onClick={() => setSearchDropdownOpen(false)}
+                          className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors"
+                        >
+                          <div>
+                            <span className="font-bold text-navy-950 block">{m.name}</span>
+                            <span className="text-[10px] text-slate-500">{m.company || m.email}</span>
+                          </div>
+                          <span className="text-[10px] font-mono text-slate-400">{m.phone}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Media */}
+                {searchResults.media?.length > 0 && (
+                  <div className="border-t border-slate-100 pt-2">
+                    <span className="font-bold text-slate-400 text-[10px] block mb-1">رسانه‌ها و فایل‌ها</span>
+                    <div className="space-y-1">
+                      {searchResults.media.map((med: any) => (
+                        <Link
+                          key={med.id}
+                          to="/admin/media"
+                          onClick={() => setSearchDropdownOpen(false)}
+                          className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors"
+                        >
+                          <span className="font-medium text-navy-950 truncate max-w-[280px]">{med.original_name}</span>
+                          <span className="text-[10px] text-slate-400">{med.alt_text || 'بدون متن جایگزین'}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {searchResults.pages.length === 0 && searchResults.articles.length === 0 && searchResults.messages.length === 0 && searchResults.media.length === 0 && (
+                  <div className="py-4 text-center text-slate-400">موردی یافت نشد.</div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3">

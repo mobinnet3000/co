@@ -7,8 +7,8 @@ interface RateLimitRecord {
 
 const memoryStore = new Map<string, RateLimitRecord>();
 
-// Clean up old entries periodically
-setInterval(() => {
+// Clean up old entries periodically (unref so it doesn't block process exit)
+const cleanupTimer = setInterval(() => {
   const now = Date.now();
   for (const [key, record] of memoryStore.entries()) {
     if (now > record.resetTime) {
@@ -16,6 +16,7 @@ setInterval(() => {
     }
   }
 }, 60000);
+cleanupTimer.unref();
 
 export function createRateLimiter(windowMs: number = 60000, maxRequests: number = 30) {
   return (req: Request, res: Response, next: NextFunction) => {

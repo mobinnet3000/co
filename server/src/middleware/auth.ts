@@ -49,3 +49,10 @@ export function requireRole(allowedRoles: string[]) {
     next();
   };
 }
+
+// Convenient aliases for routes
+export const requireAuth = authenticate;
+export const requireEditor = requireRole(['editor', 'admin', 'super_admin']);
+export const requireAdmin = requireRole(['admin', 'super_admin']);
+export const requireSuperAdmin = requireRole(['super_admin']);
+

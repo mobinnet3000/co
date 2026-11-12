@@ -160,13 +160,85 @@ export function initDatabase() {
       created_at TEXT NOT NULL
     );
 
+    -- Page Sections table for Dynamic Page Builder & CMS
+    CREATE TABLE IF NOT EXISTS page_sections (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      page_id INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+      section_type TEXT NOT NULL,
+      section_order INTEGER NOT NULL DEFAULT 0,
+      config_json TEXT NOT NULL DEFAULT '{}',
+      is_active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    -- Navigation Menus table
+    CREATE TABLE IF NOT EXISTS navigation_menus (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      location TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    -- Navigation Menu Items table (Supports hierarchical nested items)
+    CREATE TABLE IF NOT EXISTS menu_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      menu_id INTEGER NOT NULL REFERENCES navigation_menus(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      url TEXT NOT NULL,
+      parent_id INTEGER REFERENCES menu_items(id) ON DELETE CASCADE,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      target TEXT DEFAULT '_self',
+      is_active INTEGER NOT NULL DEFAULT 1
+    );
+
+    -- Frequently Asked Questions (FAQ) table
+    CREATE TABLE IF NOT EXISTS faqs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      question TEXT NOT NULL,
+      answer TEXT NOT NULL,
+      category TEXT NOT NULL DEFAULT 'general',
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      is_published INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    -- Content Revisions table for version history
+    CREATE TABLE IF NOT EXISTS content_revisions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      entity_type TEXT NOT NULL,
+      entity_id INTEGER NOT NULL,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      content_snapshot TEXT NOT NULL,
+      change_summary TEXT,
+      created_at TEXT NOT NULL
+    );
+
+    -- First-party Privacy-preserving Analytics Events
+    CREATE TABLE IF NOT EXISTS analytics_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      event_type TEXT NOT NULL DEFAULT 'pageview',
+      path TEXT NOT NULL,
+      referrer TEXT,
+      ip_hash TEXT,
+      user_agent TEXT,
+      created_at TEXT NOT NULL
+    );
+
     -- Indexes for fast lookups
     CREATE INDEX IF NOT EXISTS idx_pages_slug ON pages(slug);
     CREATE INDEX IF NOT EXISTS idx_pages_status ON pages(status);
+    CREATE INDEX IF NOT EXISTS idx_page_sections_page ON page_sections(page_id, section_order);
+    CREATE INDEX IF NOT EXISTS idx_menus_slug ON navigation_menus(slug);
+    CREATE INDEX IF NOT EXISTS idx_menu_items_menu ON menu_items(menu_id, sort_order);
     CREATE INDEX IF NOT EXISTS idx_articles_slug ON articles(slug);
     CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
     CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category_id);
     CREATE INDEX IF NOT EXISTS idx_messages_status ON contact_messages(status);
     CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
+    CREATE INDEX IF NOT EXISTS idx_analytics_path ON analytics_events(path, created_at);
   `);
 }

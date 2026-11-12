@@ -12,6 +12,9 @@ import {
   Plus,
   Shield,
   Search,
+  Eye,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { api } from '../../services/api';
@@ -22,27 +25,46 @@ export const AdminOverviewPage: React.FC = () => {
     articlesCount: 0,
     unreadMessages: 0,
     mediaCount: 0,
+    totalViews: 0,
+    todayViews: 0,
+    uniqueVisitors: 0,
   });
+  const [topPaths, setTopPaths] = useState<Array<{ path: string; views: number }>>([]);
   const [recentMessages, setRecentMessages] = useState<any[]>([]);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     Promise.all([
-      api.pages.getAll().catch(() => ({ success: false, data: [] })),
-      api.articles.getAll().catch(() => ({ success: false, data: [] })),
+      api.analytics.getDashboard().catch(() => null),
       api.messages.getAll({ limit: 5 }).catch(() => ({ success: false, data: [], unreadCount: 0 })),
       api.media.getAll().catch(() => ({ success: false, data: [] })),
-      api.users.getAuditLogs().catch(() => ({ success: false, data: [] })),
-    ]).then(([pagesRes, articlesRes, messagesRes, mediaRes, auditRes]) => {
-      setStats({
-        pagesCount: pagesRes.success ? pagesRes.data.length : 0,
-        articlesCount: articlesRes.success ? articlesRes.data.length : 0,
-        unreadMessages: messagesRes.success ? messagesRes.unreadCount : 0,
-        mediaCount: mediaRes.success ? mediaRes.data.length : 0,
-      });
-      if (messagesRes.success) setRecentMessages(messagesRes.data.slice(0, 5));
-      if (auditRes.success) setAuditLogs(auditRes.data.slice(0, 6));
+      api.pages.getAll().catch(() => ({ success: false, data: [] })),
+      api.articles.getAll().catch(() => ({ success: false, data: [] })),
+    ]).then(([analyticsRes, messagesRes, mediaRes, pagesRes, articlesRes]) => {
+      if (analyticsRes && analyticsRes.success) {
+        setStats({
+          pagesCount: analyticsRes.stats.totalPages,
+          articlesCount: analyticsRes.stats.totalArticles,
+          unreadMessages: analyticsRes.stats.unreadMessages,
+          mediaCount: analyticsRes.stats.totalMedia,
+          totalViews: analyticsRes.stats.totalViews,
+          todayViews: analyticsRes.stats.todayViews,
+          uniqueVisitors: analyticsRes.stats.uniqueVisitors,
+        });
+        setTopPaths(analyticsRes.topPaths || []);
+        if (analyticsRes.recentLogs) setAuditLogs(analyticsRes.recentLogs);
+      } else {
+        setStats((prev) => ({
+          ...prev,
+          pagesCount: pagesRes?.success ? pagesRes.data.length : 0,
+          articlesCount: articlesRes?.success ? articlesRes.data.length : 0,
+          unreadMessages: messagesRes?.success ? messagesRes.unreadCount : 0,
+          mediaCount: mediaRes?.success ? mediaRes.data.length : 0,
+        }));
+      }
+
+      if (messagesRes?.success) setRecentMessages(messagesRes.data.slice(0, 5));
       setLoading(false);
     });
   }, []);
@@ -128,6 +150,39 @@ export const AdminOverviewPage: React.FC = () => {
             </div>
             <div className="w-11 h-11 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-center border border-slate-200">
               <ImageIcon className="w-5 h-5 text-slate-600" />
+            </div>
+          </div>
+        </div>
+
+        {/* Traffic & First-Party Analytics Strip */}
+        <div className="p-6 rounded-2xl bg-navy-950 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[#EFA73F]/20 text-[#EFA73F] flex items-center justify-center border border-[#EFA73F]/30">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-white flex items-center gap-2">
+                <span>آمار بازدید و تحلیل ترافیک سایت</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">
+                  LIVE ANALYTICS
+                </span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">ثبت آنی رویدادهای بازدید کاربران بدون نیاز به کوکی‌های ردگیری شخص ثالث</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6 divide-x divide-slate-800 divide-x-reverse font-mono">
+            <div className="text-center px-4">
+              <span className="text-xs text-slate-400 block font-vazir mb-1">کل بازدیدها</span>
+              <strong className="text-xl font-bold text-[#EFA73F]">{stats.totalViews}</strong>
+            </div>
+            <div className="text-center px-4">
+              <span className="text-xs text-slate-400 block font-vazir mb-1">بازدید امروز</span>
+              <strong className="text-xl font-bold text-white">{stats.todayViews}</strong>
+            </div>
+            <div className="text-center px-4">
+              <span className="text-xs text-slate-400 block font-vazir mb-1">بازدیدکنندگان یکتا</span>
+              <strong className="text-xl font-bold text-slate-200">{stats.uniqueVisitors}</strong>
             </div>
           </div>
         </div>

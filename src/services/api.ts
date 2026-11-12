@@ -223,4 +223,127 @@ export const api = {
       }),
     getAuditLogs: () => request<{ success: boolean; data: any[] }>('/users/audit-logs'),
   },
+
+  // Dynamic Page Sections & Page Builder
+  sections: {
+    getByPageSlug: (slug: string) =>
+      request<{ success: boolean; page: any; data: Array<{ id: number; section_type: string; section_order: number; config: any; is_active: number }> }>(
+        `/sections/public/slug/${slug}`
+      ),
+    getByPageId: (pageId: number | string) =>
+      request<{ success: boolean; data: Array<{ id: number; section_type: string; section_order: number; config: any; is_active: number }> }>(
+        `/sections/page/${pageId}`
+      ),
+    create: (pageId: number | string, data: { section_type: string; config_json: string | object; is_active?: number; section_order?: number }) =>
+      request<{ success: boolean; message: string; id: number }>(`/sections/page/${pageId}`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: number | string, data: { section_type?: string; config_json?: string | object; is_active?: number; section_order?: number }) =>
+      request<{ success: boolean; message: string }>(`/sections/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: number | string) =>
+      request<{ success: boolean; message: string }>(`/sections/${id}`, {
+        method: 'DELETE',
+      }),
+    reorder: (pageId: number | string, items: Array<{ id: number; section_order: number }>) =>
+      request<{ success: boolean; message: string }>(`/sections/page/${pageId}/reorder`, {
+        method: 'POST',
+        body: JSON.stringify({ items }),
+      }),
+    duplicate: (id: number | string) =>
+      request<{ success: boolean; message: string; id: number }>(`/sections/${id}/duplicate`, {
+        method: 'POST',
+      }),
+  },
+
+  // Navigation Menus
+  menus: {
+    getPublicBySlug: (slug: string) =>
+      request<{ success: boolean; menu: any; items: any[] }>(`/menus/public/${slug}`),
+    getAllPublic: () =>
+      request<{ success: boolean; data: Record<string, { id: number; name: string; slug: string; items: any[] }> }>('/menus/public/all'),
+    getAll: () =>
+      request<{ success: boolean; data: Array<{ id: number; name: string; slug: string; location: string; item_count: number }> }>('/menus'),
+    getById: (id: number | string) =>
+      request<{ success: boolean; menu: any; itemsFlat: any[]; itemsTree: any[] }>(`/menus/${id}`),
+    create: (data: { name: string; slug: string; location?: string }) =>
+      request<{ success: boolean; message: string; id: number }>('/menus', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: number | string, data: { name?: string; location?: string }) =>
+      request<{ success: boolean; message: string }>(`/menus/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: number | string) =>
+      request<{ success: boolean; message: string }>(`/menus/${id}`, {
+        method: 'DELETE',
+      }),
+    addItem: (menuId: number | string, data: { title: string; url: string; parent_id?: number | null; sort_order?: number; target?: string; is_active?: number }) =>
+      request<{ success: boolean; message: string; id: number }>(`/menus/${menuId}/items`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    updateItem: (itemId: number | string, data: { title?: string; url?: string; parent_id?: number | null; sort_order?: number; target?: string; is_active?: number }) =>
+      request<{ success: boolean; message: string }>(`/menus/items/${itemId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    deleteItem: (itemId: number | string) =>
+      request<{ success: boolean; message: string }>(`/menus/items/${itemId}`, {
+        method: 'DELETE',
+      }),
+    reorderItems: (menuId: number | string, items: Array<{ id: number; sort_order: number; parent_id?: number | null }>) =>
+      request<{ success: boolean; message: string }>(`/menus/${menuId}/items/reorder`, {
+        method: 'POST',
+        body: JSON.stringify({ items }),
+      }),
+  },
+
+  // Analytics
+  analytics: {
+    track: (data: { event_type?: string; path: string; referrer?: string }) =>
+      request<{ success: boolean }>('/analytics/collect', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }).catch(() => ({ success: false })),
+    getDashboard: () =>
+      request<{
+        success: boolean;
+        stats: {
+          totalViews: number;
+          todayViews: number;
+          uniqueVisitors: number;
+          totalArticles: number;
+          draftArticles: number;
+          totalPages: number;
+          totalMedia: number;
+          unreadMessages: number;
+          totalMessages: number;
+        };
+        topPaths: Array<{ path: string; views: number }>;
+        trends: Array<{ date: string; views: number }>;
+        recentLogs: any[];
+      }>('/analytics/dashboard'),
+  },
+
+  // Admin Global Search
+  search: {
+    admin: (q: string) =>
+      request<{
+        success: boolean;
+        query: string;
+        data: {
+          pages: any[];
+          articles: any[];
+          messages: any[];
+          media: any[];
+          menus: any[];
+        };
+      }>(`/search/admin?q=${encodeURIComponent(q)}`),
+  },
 };

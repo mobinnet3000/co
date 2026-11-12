@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, ArrowLeft } from 'lucide-react';
 import { headerNavItems } from '../../data/navigation';
+import { api } from '../../services/api';
 import { Logo } from '../common/Logo';
 import { MobileMenu } from './MobileMenu';
 import { useScrollPosition } from '../../hooks/useScrollPosition';
@@ -12,12 +13,31 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [navItems, setNavItems] = useState<Array<{ label: string; path: string }>>(headerNavItems);
   const scrollY = useScrollPosition();
   const location = useLocation();
 
   useEffect(() => {
     setMobileMenuOpen(false);
+
+    // Track pageview in first-party analytics
+    api.analytics.track({
+      event_type: 'pageview',
+      path: location.pathname,
+      referrer: document.referrer,
+    });
   }, [location.pathname]);
+
+  useEffect(() => {
+    // Attempt to load dynamic header menu from CMS
+    api.menus.getPublicBySlug('header')
+      .then((res) => {
+        if (res.success && res.items && res.items.length > 0) {
+          setNavItems(res.items.map((it: any) => ({ label: it.title, path: it.url })));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const isScrolled = scrollY > 20;
 
@@ -39,7 +59,7 @@ export const Navbar: React.FC<NavbarProps> = () => {
 
             {/* Center: Essential Minimal Navigation Tabs */}
             <nav className="hidden lg:flex items-center gap-2 xl:gap-2.5">
-              {headerNavItems.map((item) => {
+              {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
 
                 return (

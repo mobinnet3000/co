@@ -19,11 +19,13 @@ import { BlogPage } from './pages/BlogPage';
 import { BlogDetailPage } from './pages/BlogDetailPage';
 import { ContactPage } from './pages/ContactPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { DynamicPage } from './pages/DynamicPage';
 
 // Admin CMS Pages
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminOverviewPage } from './pages/admin/AdminOverviewPage';
 import { AdminPagesPage } from './pages/admin/AdminPagesPage';
+import { AdminMenusPage } from './pages/admin/AdminMenusPage';
 import { AdminBlogPage } from './pages/admin/AdminBlogPage';
 import { AdminMediaPage } from './pages/admin/AdminMediaPage';
 import { AdminMessagesPage } from './pages/admin/AdminMessagesPage';
@@ -62,6 +64,7 @@ export function App() {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/p/:slug" element={<DynamicPage />} />
 
           {/* Admin CMS Authentication & Dashboard */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -78,6 +81,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <AdminPagesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/menus"
+            element={
+              <ProtectedRoute>
+                <AdminMenusPage />
               </ProtectedRoute>
             }
           />

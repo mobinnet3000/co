@@ -15,6 +15,10 @@ import settingsRoutes from './routes/settingsRoutes';
 import messagesRoutes from './routes/messagesRoutes';
 import seoRoutes from './routes/seoRoutes';
 import usersRoutes from './routes/usersRoutes';
+import pageSectionsRoutes from './routes/pageSectionsRoutes';
+import menusRoutes from './routes/menusRoutes';
+import analyticsRoutes from './routes/analyticsRoutes';
+import searchRoutes from './routes/searchRoutes';
 import { seoController } from './controllers/seoController';
 
 // Initialize and seed database
@@ -62,6 +66,9 @@ app.get('/api/health', (req, res) => {
 // Mount modular API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/pages', pagesRoutes);
+app.use('/api/sections', pageSectionsRoutes);
+app.use('/api/menus', menusRoutes);
+app.use('/api/analytics', analyticsRoutes);
 app.use('/api/articles', articlesRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/media', mediaRoutes);
@@ -69,12 +76,14 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/seo', seoRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/search', searchRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
 
-// Start server if executed directly
-if (process.env.NODE_ENV !== 'test') {
+// Start server if executed directly (and not in node test runner)
+const isTestRunner = process.env.NODE_ENV === 'test' || process.env.NODE_TEST_CONTEXT !== undefined || process.argv.some(arg => arg.includes('test'));
+if (!isTestRunner) {
   app.listen(config.port, '0.0.0.0', () => {
     console.log(`=======================================================`);
     console.log(`✓ MadanCo Production Backend running on port ${config.port}`);

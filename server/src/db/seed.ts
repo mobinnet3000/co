@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { db } from './database';
+import { technicalArticles } from './seedArticles';
+import { draftArticles } from './draftArticles';
 
 export function seedDatabase() {
   const now = new Date().toISOString();
@@ -32,8 +34,10 @@ export function seedDatabase() {
     ['seo_default_title', 'معدنکو (Madan Co) | فناوری داده در خدمت معدن', 'seo'],
     ['seo_default_keywords', 'معدنکو, madan co, فناوری داده در خدمت معدن, پایش خطوط فرآوری, بهینه‌سازی خطوط فرآوری, محاسبات عملیات داده ارزیابی نوین', 'seo'],
     ['seo_default_description', 'معدنکو - پلتفرم تخصصی پایش، تحلیل و بهینه‌سازی خطوط فرآوری مواد معدنی از طریق موازنه متالورژیکی و یکپارچه‌سازی داده‌های عملیاتی.', 'seo'],
-    ['google_analytics_id', '', 'analytics'],
-    ['google_search_console_code', '', 'analytics'],
+    ['brand_primary_color', '#0F1821', 'theme'],
+    ['brand_amber_color', '#EFA73F', 'theme'],
+    ['brand_crimson_color', '#C92127', 'theme'],
+    ['brand_sand_color', '#F7F3EE', 'theme'],
   ];
 
   const insertSetting = db.prepare(`
@@ -47,10 +51,11 @@ export function seedDatabase() {
 
   // 3. Seed Default Blog Categories
   const categories: Array<[string, string, string]> = [
-    ['مدیریت داده‌های معدنی', 'mineral-data-management', 'مقالات و آموزش‌های پیرامون جریان داده و استانداردهای اطلاعاتی'],
-    ['متالورژی و فرآوری', 'metallurgy-processing', 'تکنولوژی‌های خردایش، فلوتاسیون، جدایش و موازنه مواد معدنی'],
-    ['تحلیل داده صنعتی', 'industrial-analytics', 'روش‌های پایش عملکرد، راندمان متالورژیکی و تصمیم‌گیری داده‌محور'],
-    ['تحول دیجیتال در معدن', 'digital-mining', 'استقرار سیستم‌ها و فرهنگ داده‌محور در کارخانجات کانی‌آرایی'],
+    ['خردایش و آسیاکنی', 'comminution-milling', 'اصول مهندسی سنگ‌شکنی، آسیاهای خودشکن، رولرهای فشارقوی و مدارهای طبقه‌بندی'],
+    ['جدایش و فلوتاسیون', 'separation-flotation', 'شیمی سطح، کلکتورها، کف‌سازها، جدایش مغناطیسی و ثقلی کانسنگ‌های صنعتی'],
+    ['متالورژی و موازنه فرآیند', 'metallurgy-mass-balance', 'محاسبات پایستگی جرم، کینتیک جدایش و بهینه‌سازی فلوشیت کارخانه'],
+    ['مدیریت و تحلیل داده‌های صنعتی', 'industrial-data-analytics', 'یکپارچه‌سازی اطلاعات ابزاردقیق، آزمایشگاه عیارسنجی و پایش پیوسته'],
+    ['کنترل کیفیت و بهره‌برداری کارخانه', 'plant-operations-qc', 'شاخص‌های کلیدی عملکرد KPI، نمونه‌برداری پی‌یر ژی، عیب‌یابی و پایش وضعیت'],
   ];
 
   const insertCat = db.prepare(`
@@ -72,6 +77,15 @@ export function seedDatabase() {
     ['کنترل فرآیند', 'process-control'],
     ['فلوتاسیون', 'flotation'],
     ['خردایش', 'comminution'],
+    ['آسیاکنی', 'milling'],
+    ['سنگ‌شکن', 'crusher'],
+    ['هیدروسیکلون', 'hydrocyclone'],
+    ['جدایش مغناطیسی', 'magnetic-separation'],
+    ['جدایش ثقلی', 'gravity-separation'],
+    ['شاخص KPI', 'kpi'],
+    ['نمونه‌برداری', 'sampling'],
+    ['تئوری محدودیت‌ها TOC', 'toc'],
+    ['پایش وضعیت CBM', 'cbm'],
   ];
 
   const insertTag = db.prepare('INSERT OR IGNORE INTO tags (name, slug) VALUES (?, ?)');
@@ -122,6 +136,22 @@ export function seedDatabase() {
       seo_description: 'خدمات تخصصی یکپارچه‌سازی، پالایش داده، تحلیل متالورژیکی و ارزیابی عملکرد کارخانجات فرآوری کشور.',
     },
     {
+      title: 'صنایع هدف و مدارهای فرآوری',
+      slug: 'industries',
+      excerpt: 'راهکارهای کانی‌آرایی برای مس، سنگ‌آهن، سرب و روی و سایر کانی‌های استراتژیک',
+      template: 'industries',
+      seo_title: 'صنایع هدف و مدارهای فرآوری کانی‌آرایی | معدنکو',
+      seo_description: 'پوشش تخصصی زنجیره فرآوری مس، سنگ‌آهن و کنسانتره سرب و روی بر مبنای خصوصیات کانی‌شناسی کانسنگ‌های ایران.',
+    },
+    {
+      title: 'پروژه‌ها و تجربیات میدانی',
+      slug: 'projects',
+      excerpt: 'سوابق و زمینه‌های پیاده‌سازی موازنه جرم و پایش خطوط کانی‌آرایی',
+      template: 'projects',
+      seo_title: 'پروژه‌ها و تجارب متالورژیکی | معدنکو',
+      seo_description: 'پروژه‌های استقرار سامانه پایش، رفع گلوگاه‌های خردایش و طراحی جریان داده‌های فرآیندی در معادن کشور.',
+    },
+    {
       title: 'ارتباط مستقیم با ما',
       slug: 'contact',
       excerpt: 'راه‌های ارتباط مستقیم، تلفن تماس، ایمیل و نشانی شرکت',
@@ -140,78 +170,251 @@ export function seedDatabase() {
     insertPage.run(p.title, p.slug, p.excerpt, '', p.template, p.seo_title, p.seo_description, now, now);
   }
 
-  // 6. Seed Initial Confirmed Articles
-  const articlesCount = (db.prepare('SELECT COUNT(*) as c FROM articles').get() as { c: number }).c;
-  if (articlesCount === 0) {
-    const defaultArticles = [
-      {
-        title: 'نقش تحلیل داده در ارتقای راندمان کارخانجات فرآوری مواد معدنی',
-        slug: 'role-of-data-analytics-in-mineral-processing-performance',
-        summary: 'چگونه ثبت دقیق داده‌های خوراک، عیار و بازیابی به کاهش باطله و افزایش سودآوری در مدارهای کانی‌آرایی منجر می‌شود؟',
-        content_html: `
-          <h2>مقدمه: از خط تولید تا گزارش متالورژیکی</h2>
-          <p>در کارخانجات فرآوری مواد معدنی، روزانه صدها داده از بارسنج‌ها، فلومترها، چگالی‌سنج‌ها و آنالیزهای آزمایشگاهی تولید می‌شود. عدم یکپارچگی این داده‌ها باعث اتلاف ساعت‌ها زمان باارزش مهندسین فرآیند می‌شود.</p>
-          <h2>چرا موازنه جرم اهمیت دارد؟</h2>
-          <p>بدون موازنه پیوسته مواد و تطبیق جریان‌های ورودی و خروجی، امکان ردیابی خطاهای اندازه‌گیری و تلفات در باطله وجود نخواهد داشت.</p>
-          <h2>نتیجه‌گیری</h2>
-          <p>سامانه‌های متمرکز پایش داده، فاصله بین مشاهدات اپراتور و تصمیم‌گیری استراتژیک مدیران را به حداقل می‌رسانند.</p>
-        `,
-        category_slug: 'industrial-analytics',
-        author: 'واحد تحقیق و توسعه معدنکو',
-        reading_time: '۸ دقیقه',
-        is_featured: 1,
-        published_at: '۱۴۰۳/۰۸/۱۵',
-        tags: ['تحلیل داده', 'فرآوری مواد معدنی', 'موازنه جرم'],
-      },
-      {
-        title: 'اهمیت مدیریت داده‌های عملیاتی در خطوط فرآوری',
-        slug: 'importance-of-operational-data-management-in-processing-plants',
-        summary: 'بررسی راهکارهای گذر از لاگ‌بوک‌های سنتی و شیت‌های اکسل به سیستم‌های داده‌ای یکپارچه و قابل اتکا.',
-        content_html: `
-          <h2>چالش‌های سیستم‌های دستی و اکسل</h2>
-          <p>شیت‌های اکسل آسیب‌پذیر، فاقد تاریخچه ویرایش و بدون اعتبارسنجی خودکار هستند. یک خطای تایپی در ورودی تناژ می‌تواند موازنه شیفت را کاملاً منحرف سازد.</p>
-          <h2>مزایای سامانه‌های ایزوله On-Premises</h2>
-          <p>در صنایع معدنی به دلیل محدودیت‌های امنیتی، استقرار سیستم در شبکه داخلی کارخانه بدون نیاز به اینترنت بالاترین اولویت را دارد.</p>
-        `,
-        category_slug: 'mineral-data-management',
-        author: 'مهندسی داده و فرآیند',
-        reading_time: '۱۰ دقیقه',
-        is_featured: 1,
-        published_at: '۱۴۰۳/۰۸/۱۰',
-        tags: ['مدیریت داده‌های معدنی', 'کنترل فرآیند'],
-      },
-    ];
+  // 6. Seed Complete Library of Technical Articles (>= 15 articles)
+  const insertArt = db.prepare(`
+    INSERT OR IGNORE INTO articles (
+      title, slug, summary, content_html, author_name, category_id, status,
+      reading_time, is_featured, seo_title, seo_description, focus_keyword,
+      canonical_url, published_at, created_at, updated_at
+    ) VALUES (
+      ?, ?, ?, ?, ?,
+      (SELECT id FROM categories WHERE slug = ?),
+      'published', ?, ?, ?, ?, ?,
+      ?, ?, ?, ?
+    )
+  `);
 
-    const insertArt = db.prepare(`
-      INSERT INTO articles (title, slug, summary, content_html, author_name, category_id, status, reading_time, is_featured, published_at, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, (SELECT id FROM categories WHERE slug = ?), 'published', ?, ?, ?, ?, ?)
-    `);
+  for (const a of technicalArticles) {
+    const canonical = `https://madan.co.ir/blog/${a.slug}`;
+    const res = insertArt.run(
+      a.title,
+      a.slug,
+      a.summary,
+      a.content_html,
+      a.author,
+      a.category_slug,
+      a.reading_time,
+      a.is_featured,
+      a.seo_title,
+      a.seo_description,
+      a.focus_keyword,
+      canonical,
+      a.published_at,
+      now,
+      now
+    );
 
-    for (const a of defaultArticles) {
-      const res = insertArt.run(
-        a.title,
-        a.slug,
-        a.summary,
-        a.content_html,
-        a.author,
-        a.category_slug,
-        a.reading_time,
-        a.is_featured,
-        a.published_at,
-        now,
-        now
-      );
-
-      const articleId = Number(res.lastInsertRowid);
+    // If inserted, link tags
+    const article = db.prepare('SELECT id FROM articles WHERE slug = ?').get(a.slug) as { id: number } | undefined;
+    if (article) {
       const insertArtTag = db.prepare(`
         INSERT OR IGNORE INTO article_tags (article_id, tag_id)
         SELECT ?, id FROM tags WHERE name = ?
       `);
-
       for (const t of a.tags) {
-        insertArtTag.run(articleId, t);
+        insertArtTag.run(article.id, t);
       }
     }
-    console.log('✓ Initial articles and knowledge base entries seeded.');
+  }
+
+  // Seed Draft Articles (10 additional engineering articles)
+  const insertDraftArt = db.prepare(`
+    INSERT OR IGNORE INTO articles (
+      title, slug, summary, content_html, author_name, category_id, status,
+      reading_time, is_featured, seo_title, seo_description, focus_keyword,
+      canonical_url, published_at, created_at, updated_at
+    ) VALUES (
+      ?, ?, ?, ?, ?,
+      (SELECT id FROM categories WHERE slug = ?),
+      'draft', ?, ?, ?, ?, ?,
+      ?, ?, ?, ?
+    )
+  `);
+
+  for (const d of draftArticles) {
+    const canonical = `https://madan.co.ir/blog/${d.slug}`;
+    insertDraftArt.run(
+      d.title,
+      d.slug,
+      d.summary,
+      d.content_html,
+      d.author,
+      d.category_slug,
+      d.reading_time,
+      d.is_featured,
+      d.seo_title,
+      d.seo_description,
+      d.focus_keyword,
+      canonical,
+      d.published_at,
+      now,
+      now
+    );
+
+    const draft = db.prepare('SELECT id FROM articles WHERE slug = ?').get(d.slug) as { id: number } | undefined;
+    if (draft) {
+      const insertArtTag = db.prepare(`
+        INSERT OR IGNORE INTO article_tags (article_id, tag_id)
+        SELECT ?, id FROM tags WHERE name = ?
+      `);
+      for (const t of d.tags) {
+        insertArtTag.run(draft.id, t);
+      }
+    }
+  }
+  console.log(`✓ Technical Articles verified: ${technicalArticles.length} published + ${draftArticles.length} drafts.`);
+
+  // 7. Seed Navigation Menus if not exists
+  const menuCount = (db.prepare('SELECT COUNT(*) as c FROM navigation_menus').get() as { c: number }).c;
+  if (menuCount === 0) {
+    // Header Menu
+    const headerMenu = db.prepare(`
+      INSERT INTO navigation_menus (name, slug, location, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+    `).run('منوی اصلی هدر', 'header', 'header', now, now);
+    const headerMenuId = Number(headerMenu.lastInsertRowid);
+
+    const headerItems = [
+      { title: 'صفحه اصلی', url: '/', sort: 1 },
+      { title: 'سامانه پایش', url: '/platform', sort: 2 },
+      { title: 'خدمات تخصصی', url: '/services', sort: 3 },
+      { title: 'صنایع هدف', url: '/industries', sort: 4 },
+      { title: 'دانشنامه و مقالات', url: '/blog', sort: 5 },
+      { title: 'درباره ما', url: '/about', sort: 6 },
+      { title: 'تماس با ما', url: '/contact', sort: 7 },
+    ];
+
+    const insertMenuItem = db.prepare(`
+      INSERT INTO menu_items (menu_id, title, url, sort_order, is_active)
+      VALUES (?, ?, ?, ?, 1)
+    `);
+
+    for (const it of headerItems) {
+      insertMenuItem.run(headerMenuId, it.title, it.url, it.sort);
+    }
+
+    // Footer Menu
+    const footerMenu = db.prepare(`
+      INSERT INTO navigation_menus (name, slug, location, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+    `).run('منوی پاورقی فوتر', 'footer', 'footer', now, now);
+    const footerMenuId = Number(footerMenu.lastInsertRowid);
+
+    const footerItems = [
+      { title: 'سامانه تحلیل داده‌های خطوط', url: '/platform', sort: 1 },
+      { title: 'خدمات موازنه متالورژیکی', url: '/services', sort: 2 },
+      { title: 'شناسنامه شرکتی', url: '/company', sort: 3 },
+      { title: 'دانشنامه متالورژی', url: '/blog', sort: 4 },
+      { title: 'تماس و نشانی شرکت', url: '/contact', sort: 5 },
+    ];
+
+    for (const it of footerItems) {
+      insertMenuItem.run(footerMenuId, it.title, it.url, it.sort);
+    }
+    console.log('✓ Navigation menus seeded (header & footer).');
+  }
+
+  // 8. Seed Default Sections for Home Page if not exists
+  const homePage = db.prepare("SELECT id FROM pages WHERE slug = 'home'").get() as { id: number } | undefined;
+  if (homePage) {
+    const sectionCount = (db.prepare('SELECT COUNT(*) as c FROM page_sections WHERE page_id = ?').get(homePage.id) as { c: number }).c;
+    if (sectionCount === 0) {
+      const defaultSections = [
+        {
+          type: 'hero',
+          order: 0,
+          config: {
+            badge: 'فناوری داده در خدمت معدن',
+            title: 'پایش، موازنه و بهینه‌سازی هوشمند خطوط فرآوری مواد معدنی',
+            subtitle: 'سامانه تخصصی یکپارچه‌سازی و پردازش داده‌های صنعتی، ایجاد موازنه پیوسته متالورژیکی و کاهش چشمگیر باطله در کارخانجات کانی‌آرایی کشور.',
+            primaryCtaText: 'آشنایی با سامانه پایش',
+            primaryCtaUrl: '/platform',
+            secondaryCtaText: 'درخواست مشاوره تخصصی',
+            secondaryCtaUrl: '/contact',
+          },
+        },
+        {
+          type: 'features',
+          order: 1,
+          config: {
+            title: 'چرا رویکرد داده‌محور در فرآوری مواد معدنی ضروری است؟',
+            subtitle: 'گذر از ثبت سنتی لاگ‌بوک و شیت‌های اکسل آسیب‌پذیر به بستری ایزوله، دقیق و قابل اتکا در شبکه داخلی کارخانه.',
+            items: [
+              {
+                icon: 'Database',
+                title: 'تک‌منبع حقیقت داده‌ای',
+                description: 'حذف مغایرت‌ها میان آمارهای آزمایشگاه، اتاق کنترل و اتاق موازنه متالورژیکی با استقرار پایگاه داده متمرکز.',
+              },
+              {
+                icon: 'Cpu',
+                title: 'موازنه پیوسته پایستگی ماده',
+                description: 'محاسبه لحظه‌ای خطاهای اندازه‌گیری جریان‌ها بر مبنای ریاضیات کمترین مربعات خطا و فرمول‌های بقای جرم.',
+              },
+              {
+                icon: 'ShieldCheck',
+                title: 'استقرار ایزوله On-Premises',
+                description: 'کارکرد پایدار در بستر شبکه محلی (LAN) کارخانه بدون هیچ‌گونه نیاز به اینترنت و با بالاترین استانداردهای امنیت داده صنعتی.',
+              },
+            ],
+          },
+        },
+        {
+          type: 'stats',
+          order: 2,
+          config: {
+            title: 'دستاوردهای مهندسی موازنه و پایش خطوط فرآوری',
+            items: [
+              { value: '۱۰۰٪', label: 'استقرار درون‌سازمانی و آفلاین', sub: 'ایزوله در شبکه اختصاصی کارخانه' },
+              { value: '۰٫۵ تا ۲٪', label: 'پتانسیل افزایش بازیابی متالورژیکی', sub: 'با اصلاح خطاهای جریان و دانه خوراک' },
+              { value: '۹۰٪', label: 'کاهش خطاهای انسانی ثبت آمار', sub: 'حذف ورود دستی تناژ و محاسبات اکسل' },
+              { value: '۲۴/۷', label: 'دقت در موازنه جرم پیوسته', sub: 'پایش مستمر دبی، چگالی و عیار' },
+            ],
+          },
+        },
+        {
+          type: 'faq',
+          order: 3,
+          config: {
+            title: 'پرسش‌های متداول مدیران و مهندسین فرآیند',
+            subtitle: 'پاسخ به سوالات کلیدی درباره نحوه استقرار، سازگاری با سیستم‌های موجود و امنیت داده‌ها.',
+            items: [
+              {
+                q: 'آیا برای اجرای سامانه نیاز به اتصال به اینترنت وجود دارد؟',
+                a: 'خیر. معماری سامانه به گونه‌ای طراحی شده که به صورت ۱۰۰٪ آفلاین بر روی سرور یا رایانه محلی کارخانه (On-Premises) در بستر شبکه داخلی نصب شده و هیچ داده‌ای از محیط کارخانه خارج نمی‌شود.',
+              },
+              {
+                q: 'نحوه دریافت داده‌ها از آزمایشگاه و سیستم‌های ابزاردقیق چگونه است؟',
+                a: 'سامانه از هر دو روش اتصال خودکار به پایگاه داده سیستم‌های اسکادا/PLC و بارگذاری اکسل یا ورود داده شیفت با اعتبارسنجی خودکار پشتیبانی می‌کند.',
+              },
+              {
+                q: 'موازنه متالورژیکی چگونه خطای جریان‌ها را تصحیح می‌کند؟',
+                a: 'الگوریتم‌های موازنه جرم با فرمولاسیون ریاضی پی‌یر ژی و تکنیک کمترین مربعات وزن‌دار، جریان‌های نامتعادل را به گونه‌ای تعدیل می‌کنند که قانون بقای جرم با حداقل خطای کل برقرار شود.',
+              },
+            ],
+          },
+        },
+        {
+          type: 'cta',
+          order: 4,
+          config: {
+            title: 'آماده تحول در ثبت و تحلیل داده‌های کارخانه فرآوری خود هستید؟',
+            subtitle: 'جهت دریافت دمو، بررسی زیرساخت‌های شبکه کارخانه یا هماهنگی جلسه حضوری با کارشناسان متالورژی ما در تماس باشید.',
+            buttonText: 'تماس با واحد مهندسی',
+            buttonUrl: '/contact',
+            phone: '09999196630',
+          },
+        },
+      ];
+
+      const insertSection = db.prepare(`
+        INSERT INTO page_sections (page_id, section_type, section_order, config_json, is_active, created_at, updated_at)
+        VALUES (?, ?, ?, ?, 1, ?, ?)
+      `);
+
+      for (const s of defaultSections) {
+        insertSection.run(homePage.id, s.type, s.order, JSON.stringify(s.config), now, now);
+      }
+      console.log('✓ Default home page dynamic sections seeded.');
+    }
   }
 }

@@ -12,7 +12,7 @@ export const articlesController = {
 
     let query = `
       SELECT a.id, a.title, a.slug, a.summary, a.featured_image, a.author_name,
-             a.reading_time, a.is_featured, a.published_at, a.created_at,
+             a.reading_time, a.is_featured, a.status, a.published_at, a.created_at,
              c.name as category_name, c.slug as category_slug
       FROM articles a
       LEFT JOIN categories c ON a.category_id = c.id
